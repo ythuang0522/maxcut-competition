@@ -59,7 +59,7 @@ def main():
     if not FOUNDATION.exists():
         raise SystemExit("build the foundation first: make foundation")
     if not INST[1].exists():
-        raise SystemExit("generate the instances first: make instances")
+        raise SystemExit("the dev graphs are missing: git checkout instances/")
     meta = json.loads((ROOT / "instances/dev_reg10k.meta.json").read_text())
 
     with tempfile.TemporaryDirectory() as tmp:

@@ -308,7 +308,7 @@ def main():
 
     missing = [str(p) for _, p, _ in instances if not p.exists()]
     if missing:
-        sys.exit("missing instance files (run:  make instances):\n  " + "\n  ".join(missing))
+        sys.exit("missing instance files (run:  scripts/download.sh):\n  " + "\n  ".join(missing))
 
     ratios_by_cat = defaultdict(list)
     rows, records = [], []
@@ -334,7 +334,7 @@ def main():
                 sys.exit(f"{mc}: meta says m={meta['m']} but the file has {m} edges")
             if meta.get("instance_sha256") and meta["instance_sha256"] != sha256_file(mc):
                 sys.exit(f"{mc}: the file's digest does not match its meta.json -- "
-                         "regenerate it (make instances)")
+                         "re-download it (scripts/download.sh)")
             rec.update(n=n, m=m, upper_bound=ub,
                        ref_cut=meta.get("ref_cut"),
                        meta_sha256=sha256_file(meta_path))

@@ -2,15 +2,14 @@
 """Generate the competition's graphs from the manifest.
 
     python3 -m tools.gen                                   # everything in instances/
-    python3 -m tools.gen --instance reg400k --seed 12345 --out mydata
+    python3 -m tools.gen --instance reg800k --seed 12345 --out mydata
 
-The graphs are large, so they are not stored in git: this rebuilds them
-bit-for-bit from the seed in tools/manifest/public.json by calling the C++
-generator tools/gen/gen (integer arithmetic only, so every machine produces
-the same bytes). The SHA-256 of each generated file is checked against
-checksums/*.sha256 when the manifest's own seed is used; a mismatch means
-your build of the generator differs and must be reported, not debugged as an
-algorithm problem.
+Students get the scored graphs from the GitHub Release (scripts/download.sh);
+this is the instructor's tool that made them, and the way to make practice
+graphs of the same families with your own seed. It calls the C++ generator
+tools/gen/gen (integer arithmetic only, so every machine produces the same
+bytes). When the manifest's own seed is used, the SHA-256 of each generated
+file is checked against checksums/*.sha256.
 
 A <name>.meta.json is written beside each <name>.mc with the parameters and
 the digest. The proven upper bound and the reference cut are added by

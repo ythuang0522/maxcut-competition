@@ -28,11 +28,10 @@ solver: solver.cpp
 
 # --- instances ---------------------------------------------------------------
 
-# The graphs are not in git (about 190 MB); they are regenerated bit-for-bit
-# from the seeds in tools/manifest/public.json and checked against
-# checksums/*.sha256. Takes about ten seconds.
-instances: tools/gen/gen
-	python3 -m tools.gen --manifest tools/manifest/public.json --out instances
+# The six scored graphs (370 MB) are fetched from the GitHub Release and
+# checked against checksums/scored.sha256. The dev graphs are in the repo.
+instances:
+	scripts/download.sh
 
 # --- instructor / tooling targets ------------------------------------------
 
