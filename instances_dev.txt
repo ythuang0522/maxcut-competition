@@ -1,0 +1,8 @@
+# The practice set: same six families, small, 10 s each. Not scored.
+# <category> <instance.mc> <time_limit_seconds>
+RANDOM      instances/dev_reg10k.mc   10
+RANDOM      instances/dev_gnm8k.mc    10
+RANDOM      instances/dev_pow8k.mc    10
+STRUCTURED  instances/dev_tri100.mc   10
+STRUCTURED  instances/dev_geo8k.mc    10
+STRUCTURED  instances/dev_comm8k.mc   10

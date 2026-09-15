@@ -1,0 +1,32 @@
+{
+  "name": "dev_gnm8k",
+  "family": "gnm",
+  "category": "RANDOM",
+  "time_limit_s": 10,
+  "seed": 20260915,
+  "params": {
+    "n": 8000,
+    "m": 64000,
+    "wmax": 100
+  },
+  "description": "dev tier",
+  "n": 8000,
+  "m": 64000,
+  "total_weight": 3226545,
+  "weighted": true,
+  "deg_min": 3,
+  "deg_max": 39,
+  "instance_sha256": "f79775a36a7256337a19a3834f64c12f5725b35a5e578e02e47c677c36645605",
+  "upper_bound": 2468859,
+  "lambda_max": 1234.306356244,
+  "sdp_primal": 2461820.743,
+  "foundation_cut": 2204802,
+  "foundation_ratio": 1.11976,
+  "ref_cut": 2303107,
+  "ref_ratio": 1.07197,
+  "ref60_ratio": 1.07216,
+  "ref_seconds": 30,
+  "ref60_cut": 2302693,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

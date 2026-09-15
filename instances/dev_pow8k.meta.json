@@ -1,0 +1,31 @@
+{
+  "name": "dev_pow8k",
+  "family": "powerlaw",
+  "category": "RANDOM",
+  "time_limit_s": 10,
+  "seed": 20260915,
+  "params": {
+    "n": 8000,
+    "k": 6
+  },
+  "description": "dev tier",
+  "n": 8000,
+  "m": 47979,
+  "total_weight": 47979,
+  "weighted": false,
+  "deg_min": 6,
+  "deg_max": 356,
+  "instance_sha256": "731ec72d60047eaa35031f01c014b257e2d0ee4f30877c118122d118d9ced9e1",
+  "upper_bound": 36227,
+  "lambda_max": 18.112068694,
+  "sdp_primal": 36143.588,
+  "foundation_cut": 31885,
+  "foundation_ratio": 1.13618,
+  "ref_cut": 33779,
+  "ref_ratio": 1.07247,
+  "ref60_ratio": 1.07234,
+  "ref_seconds": 30,
+  "ref60_cut": 33783,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

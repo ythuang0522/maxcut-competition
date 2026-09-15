@@ -1,0 +1,145 @@
+{
+  "seed": 20260915,
+  "instances": [
+    {
+      "name": "reg800k",
+      "family": "regular",
+      "category": "RANDOM",
+      "time_limit_s": 60,
+      "params": {
+        "n": 800000,
+        "d": 10
+      },
+      "description": "Random 10-regular graph on 800,000 vertices, unit weights. The textbook case."
+    },
+    {
+      "name": "gnm600k",
+      "family": "gnm",
+      "category": "RANDOM",
+      "time_limit_s": 60,
+      "params": {
+        "n": 600000,
+        "m": 4800000,
+        "wmax": 100
+      },
+      "description": "Erdos-Renyi graph, 600,000 vertices and 4.8 million edges (average degree 16), weights 1-100."
+    },
+    {
+      "name": "pow600k",
+      "family": "powerlaw",
+      "category": "RANDOM",
+      "time_limit_s": 60,
+      "params": {
+        "n": 600000,
+        "k": 6
+      },
+      "description": "Preferential-attachment graph, 600,000 vertices, 6 edges per newcomer, unit weights: a few hubs of degree in the thousands, most vertices of degree 6."
+    },
+    {
+      "name": "tri900",
+      "family": "tri",
+      "category": "STRUCTURED",
+      "time_limit_s": 60,
+      "params": {
+        "L": 900,
+        "wmax": 100
+      },
+      "description": "Triangular lattice on a 900 x 900 torus (810,000 vertices, degree 6), weights 1-100. Every triangle must leave one edge uncut: a frustrated antiferromagnet."
+    },
+    {
+      "name": "geo600k",
+      "family": "geo",
+      "category": "STRUCTURED",
+      "time_limit_s": 60,
+      "params": {
+        "n": 600000,
+        "deg": 12,
+        "wmax": 100
+      },
+      "description": "Random geometric graph: 600,000 points in a square, pairs within a radius joined (average degree 12), closer pairs heavier. Dense local clusters of triangles."
+    },
+    {
+      "name": "comm600k",
+      "family": "community",
+      "category": "STRUCTURED",
+      "time_limit_s": 60,
+      "params": {
+        "n": 600000,
+        "m": 4800000,
+        "K": 600,
+        "pin": 800
+      },
+      "description": "Planted partition: 600 hidden communities of 1,000 vertices, 80% of the 4.8 million edges inside a community, unit weights, labels shuffled."
+    },
+    {
+      "name": "dev_reg10k",
+      "family": "regular",
+      "category": "RANDOM",
+      "time_limit_s": 10,
+      "params": {
+        "n": 10000,
+        "d": 10
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_gnm8k",
+      "family": "gnm",
+      "category": "RANDOM",
+      "time_limit_s": 10,
+      "params": {
+        "n": 8000,
+        "m": 64000,
+        "wmax": 100
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_pow8k",
+      "family": "powerlaw",
+      "category": "RANDOM",
+      "time_limit_s": 10,
+      "params": {
+        "n": 8000,
+        "k": 6
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_tri100",
+      "family": "tri",
+      "category": "STRUCTURED",
+      "time_limit_s": 10,
+      "params": {
+        "L": 100,
+        "wmax": 100
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_geo8k",
+      "family": "geo",
+      "category": "STRUCTURED",
+      "time_limit_s": 10,
+      "params": {
+        "n": 8000,
+        "deg": 12,
+        "wmax": 100
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_comm8k",
+      "family": "community",
+      "category": "STRUCTURED",
+      "time_limit_s": 10,
+      "params": {
+        "n": 8000,
+        "m": 64000,
+        "K": 8,
+        "pin": 800
+      },
+      "description": "dev tier"
+    }
+  ]
+}

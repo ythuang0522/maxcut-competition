@@ -1,0 +1,31 @@
+{
+  "name": "dev_tri100",
+  "family": "tri",
+  "category": "STRUCTURED",
+  "time_limit_s": 10,
+  "seed": 20260915,
+  "params": {
+    "L": 100,
+    "wmax": 100
+  },
+  "description": "dev tier",
+  "n": 10000,
+  "m": 30000,
+  "total_weight": 1519787,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "42f43a15d33c30d22a0b6dff17bffdf4a72017aca6cdaca37d8ceb4eda34cd46",
+  "upper_bound": 1208008,
+  "lambda_max": 483.154988901,
+  "sdp_primal": 1207809.465,
+  "foundation_cut": 1095978,
+  "foundation_ratio": 1.10222,
+  "ref_cut": 1163428,
+  "ref_ratio": 1.03832,
+  "ref60_ratio": 1.03811,
+  "ref_seconds": 30,
+  "ref60_cut": 1163662,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

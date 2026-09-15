@@ -1,0 +1,31 @@
+{
+  "name": "pow600k",
+  "family": "powerlaw",
+  "category": "RANDOM",
+  "time_limit_s": 60,
+  "seed": 20260915,
+  "params": {
+    "n": 600000,
+    "k": 6
+  },
+  "description": "Preferential-attachment graph, 600,000 vertices, 6 edges per newcomer, unit weights: a few hubs of degree in the thousands, most vertices of degree 6.",
+  "n": 600000,
+  "m": 3599979,
+  "total_weight": 3599979,
+  "weighted": false,
+  "deg_min": 6,
+  "deg_max": 3462,
+  "instance_sha256": "13d697506e1602e08ced91e441910ab1899efec579602966927d39243d853c67",
+  "upper_bound": 2740392,
+  "lambda_max": 18.267454042,
+  "sdp_primal": 2724182.622,
+  "foundation_cut": 2391828,
+  "foundation_ratio": 1.14573,
+  "ref_cut": 2531274,
+  "ref_ratio": 1.08261,
+  "ref60_ratio": 1.08456,
+  "ref_seconds": 300,
+  "ref60_cut": 2526743,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}
