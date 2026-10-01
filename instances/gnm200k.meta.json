@@ -1,0 +1,32 @@
+{
+  "name": "gnm200k",
+  "family": "gnm",
+  "category": "RANDOM",
+  "time_limit_s": 60,
+  "seed": 20261001,
+  "params": {
+    "n": 200000,
+    "m": 300000,
+    "wmax": 100
+  },
+  "description": "Sparse Erdos-Renyi graph, 200,000 vertices and 300,000 edges (average degree 3), weights 1-100; degrees vary and some vertices are isolated.",
+  "n": 200000,
+  "m": 300000,
+  "total_weight": 15128631,
+  "weighted": true,
+  "deg_min": 0,
+  "deg_max": 13,
+  "instance_sha256": "da3341fd200099e64d04a14def2b4abefc4c7beda56324b373f364097445fd26",
+  "upper_bound": 14654742,
+  "lambda_max": 293.065538922,
+  "sdp_primal": 14636292.063,
+  "foundation_cut": 12872948,
+  "foundation_ratio": 1.13841,
+  "ref_cut": 14127256,
+  "ref_ratio": 1.03734,
+  "ref60_ratio": 1.03996,
+  "ref_seconds": 300,
+  "ref60_cut": 14091679,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

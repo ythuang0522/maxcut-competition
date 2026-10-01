@@ -1,0 +1,31 @@
+{
+  "name": "reg200k",
+  "family": "regular",
+  "category": "RANDOM",
+  "time_limit_s": 60,
+  "seed": 20261001,
+  "params": {
+    "n": 200000,
+    "d": 3
+  },
+  "description": "Random 3-regular graph on 200,000 vertices, unit weights. Sparse: every vertex has exactly three neighbours.",
+  "n": 200000,
+  "m": 300000,
+  "total_weight": 300000,
+  "weighted": false,
+  "deg_min": 3,
+  "deg_max": 3,
+  "instance_sha256": "94d2adf527f42336fb2e2c4b878389dc86df916feb9b954985d3354b2f6de4e6",
+  "upper_bound": 291519,
+  "lambda_max": 5.829802212,
+  "sdp_primal": 291164.698,
+  "foundation_cut": 254406,
+  "foundation_ratio": 1.14588,
+  "ref_cut": 276642,
+  "ref_ratio": 1.05378,
+  "ref60_ratio": 1.05602,
+  "ref_seconds": 300,
+  "ref60_cut": 276055,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

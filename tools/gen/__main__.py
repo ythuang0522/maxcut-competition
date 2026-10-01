@@ -2,7 +2,7 @@
 """Generate the competition's graphs from the manifest.
 
     python3 -m tools.gen                                   # everything in instances/
-    python3 -m tools.gen --instance reg800k --seed 12345 --out mydata
+    python3 -m tools.gen --instance reg200k --seed 12345 --out mydata
 
 Students get the scored graphs from the GitHub Release (scripts/download.sh);
 this is the instructor's tool that made them, and the way to make practice

@@ -1,8 +1,8 @@
 # The scored set: six graphs, 60 s of wall clock each, one thread.
 # <category> <instance.mc> <time_limit_seconds>
-RANDOM      instances/reg800k.mc   60
-RANDOM      instances/gnm600k.mc   60
-RANDOM      instances/pow600k.mc   60
+RANDOM      instances/reg200k.mc   60
+RANDOM      instances/regw200k.mc  60
+RANDOM      instances/gnm200k.mc   60
+STRUCTURED  instances/tri400.mc    60
 STRUCTURED  instances/tri900.mc    60
-STRUCTURED  instances/geo600k.mc   60
-STRUCTURED  instances/comm600k.mc  60
+STRUCTURED  instances/geo20k.mc    60

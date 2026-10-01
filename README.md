@@ -29,14 +29,14 @@ the `Overall geomean ratio` line is your score. **Lower is better.**
 
 ```sh
 make foundation                          # 1. build the baseline
-scripts/download.sh                      # 2. fetch the six scored graphs (130 MB, once)
+scripts/download.sh                      # 2. fetch the six scored graphs (25 MB, once)
 cp maxcut_foundation.cpp solver.cpp      # 3. this file is your assignment
 make solver                              #    ...edit solver.cpp, rebuild...
 python3 grade.py --solver ./solver --instances instances_dev.txt              # 4. quick check (1 min)
 python3 grade.py --solver ./solver --instances instances.txt --json result.json   # 5. score (6 min)
 ```
 
-Step 2 downloads the six scored graphs (370 MB uncompressed, too large for
+Step 2 downloads the six scored graphs (61 MB uncompressed, too large for
 git) and checks every file's SHA-256 against `checksums/`; the practice graphs
 are already in the repo. Step 5 prints a table and writes `result.json`.
 Before you change anything, `solver.cpp` *is* the foundation, so this is what
@@ -45,16 +45,16 @@ you see (times in seconds):
 ```
 category   instance         n        m limit   wall        cut      bound   ratio     gap  note
 ----------------------------------------------------------------------------------------------------------
-RANDOM     reg800k     800000  4000000    60    0.7    2713678    3208968  1.1825  18.25%  ok
-RANDOM     gnm600k     600000  4800000    60    0.7  165248722  186761697  1.1302  13.02%  ok
-RANDOM     pow600k     600000  3599979    60    0.7    2391828    2740392  1.1457  14.57%  ok
-STRUCTURED tri900      810000  2430000    60    0.7   88742763   97572848  1.0995   9.95%  ok
-STRUCTURED geo600k     600000  3592407    60    0.7  107284950  113514185  1.0581   5.81%  ok
-STRUCTURED comm600k    600000  4800000    60    0.7    3135083    3546657  1.1313  13.13%  ok
+RANDOM     reg200k     200000   300000    60    0.1     254406     291519  1.1459  14.59%  ok
+RANDOM     regw200k    200000   300000    60    0.1   13146679   14917537  1.1347  13.47%  ok
+RANDOM     gnm200k     200000   300000    60    0.1   12872948   14654742  1.1384  13.84%  ok
+STRUCTURED tri400      160000   480000    60    0.1   17532834   19274036  1.0993   9.93%  ok
+STRUCTURED tri900      810000  2430000    60    0.5   88685299   97546378  1.0999   9.99%  ok
+STRUCTURED geo20k       20000   118572    60    0.0    3554765    3761949  1.0583   5.83%  ok
 
-Random     geomean ratio = 1.1526  (n=3)
-Structured geomean ratio = 1.0959  (n=3)
-Overall    geomean ratio = 1.1239  (n=6)   <- your score; lower is better, 1.0000 would be optimal
+Random     geomean ratio = 1.1397  (n=3)
+Structured geomean ratio = 1.0857  (n=3)
+Overall    geomean ratio = 1.1123  (n=6)   <- your score; lower is better, 1.0000 would be optimal
 ```
 
 As you improve `solver.cpp` the `ratio` column
@@ -64,21 +64,21 @@ annealing for the whole budget and runs out of time on one instance:
 ```
 category   instance         n        m limit   wall        cut      bound   ratio     gap  note
 ----------------------------------------------------------------------------------------------------------
-RANDOM     reg800k     800000  4000000    60   59.8    2942572    3208968  1.0905   9.05%  ok
-RANDOM     gnm600k     600000  4800000    60   59.8  172551504  186761697  1.0824   8.24%  ok
-RANDOM     pow600k     600000  3599979    60   59.8    2526743    2740392  1.0846   8.46%  ok
-STRUCTURED tri900      810000  2430000    60   61.0          -   97572848  2.0000       -  TIMEOUT
-STRUCTURED geo600k     600000  3592407    60   59.8  111192062  113514185  1.0209   2.09%  ok
-STRUCTURED comm600k    600000  4800000    60   59.8    3289761    3546657  1.0781   7.81%  ok
+RANDOM     reg200k     200000   300000    60   59.8     276055     291519  1.0560   5.60%  ok
+RANDOM     regw200k    200000   300000    60   59.8   14428020   14917537  1.0339   3.39%  ok
+RANDOM     gnm200k     200000   300000    60   59.8   14091679   14654742  1.0400   4.00%  ok
+STRUCTURED tri400      160000   480000    60   59.8   18531758   19274036  1.0401   4.01%  ok
+STRUCTURED tri900      810000  2430000    60   61.0          -   97546378  2.0000       -  TIMEOUT
+STRUCTURED geo20k       20000   118572    60   59.8    3693464    3761949  1.0185   1.85%  ok
 
-Random     geomean ratio = 1.0858  (n=3)
-Structured geomean ratio = 1.3008  (n=3)
-Overall    geomean ratio = 1.1885  (n=6)   <- your score; lower is better, 1.0000 would be optimal
+Random     geomean ratio = 1.0433  (n=3)
+Structured geomean ratio = 1.2844  (n=3)
+Overall    geomean ratio = 1.1576  (n=6)   <- your score; lower is better, 1.0000 would be optimal
 ```
 
 `note=ok` means a valid cut was written in time. Anything else means that
 instance scored **2.0**, and the `TIMEOUT` line above cost this solver most of
-its score (without it the mean would be about 1.07). A valid cut first, then
+its score (without it the mean would be about 1.04). A valid cut first, then
 a heavy one. Manage your clock: the limit is `argv[3]`, and the grader kills
 you at 61 s whatever you were about to write.
 
@@ -88,7 +88,7 @@ upload the two files whenever you want to see where you stand.
 ### Iterating quickly
 
 The scored run takes six minutes if your solver uses its whole budget. While
-you work, use the dev set, which has the same six families at 8,000–10,000
+you work, use the dev set, which has the same kinds of graph at 3,600–10,000
 vertices and gives each 10 s:
 
 ```sh
@@ -173,12 +173,12 @@ graph (see below). Your score is the geometric mean of the six ratios.
 - **A failed instance scores 2.0 and still counts.** An invalid cut, a
   timeout, too much memory, or extra threads on one instance drags your mean
   up; they are never dropped. Running the unmodified foundation on an
-  instance (1.06–1.18) is always better than failing it. So is a random cut
+  instance (1.06–1.15) is always better than failing it. So is a random cut
   (about 1.6): every weight is positive, so half the total weight is always
   within reach.
-- Three instances are **RANDOM** (random regular, Erdős–Rényi, power-law),
-  three are **STRUCTURED** (a frustrated triangular lattice, a geometric
-  graph, planted communities). `grade.py` reports the two sub-means, but the
+- Three instances are **RANDOM** (sparse random graphs: 3-regular unweighted,
+  3-regular weighted, Erdős–Rényi), three are **STRUCTURED** (a frustrated
+  triangular lattice at two sizes, a geometric graph). `grade.py` reports the two sub-means, but the
   overall geometric mean is your score.
 - **The bound is not the optimum.** It is the value of the semidefinite
   relaxation, which on these graphs is a few percent above the true maximum
@@ -203,17 +203,18 @@ graph (see below). Your score is the geometric mean of the six ratios.
 
 ## The data
 
-Six graphs are scored. Each is a different kind of graph, so a trick that
-helps on one may not help on another:
+Six graphs are scored: three sparse random graphs (average degree 3) and three
+geometric or lattice graphs. A trick that helps on one kind may not help on
+the other:
 
 | instance | vertices | edges | family | what it is | bound | foundation | reference 60 s | reference 5 min |
 |---|---:|---:|---|---|---:|---:|---:|---:|
-| `reg800k` | 800,000 | 4,000,000 | RANDOM | random 10-regular graph, unit weights; the textbook case | 3,208,968 | 1.1825 | 1.0905 | 1.0886 |
-| `gnm600k` | 600,000 | 4,800,000 | RANDOM | Erdős–Rényi, average degree 16, weights 1–100 | 186,761,697 | 1.1302 | 1.0824 | 1.0803 |
-| `pow600k` | 600,000 | 3,599,979 | RANDOM | preferential attachment, 6 edges per newcomer, unit weights: hubs of degree in the thousands, most vertices of degree 6 | 2,740,392 | 1.1457 | 1.0846 | 1.0826 |
-| `tri900` | 810,000 | 2,430,000 | STRUCTURED | triangular lattice on a 900 × 900 torus, weights 1–100; every triangle must leave one edge uncut | 97,572,848 | 1.0995 | 1.0426 | 1.0399 |
-| `geo600k` | 600,000 | 3,592,407 | STRUCTURED | random points in a square, pairs within a radius joined, closer pairs heavier; dense local clusters | 113,514,185 | 1.0581 | 1.0209 | 1.0195 |
-| `comm600k` | 600,000 | 4,800,000 | STRUCTURED | 600 hidden communities of 1,000 vertices, 80% of edges inside a community, labels shuffled | 3,546,657 | 1.1313 | 1.0781 | 1.0766 |
+| `reg200k` | 200,000 | 300,000 | RANDOM | random 3-regular graph, unit weights; every vertex has exactly three neighbours | 291,519 | 1.1459 | 1.0560 | 1.0538 |
+| `regw200k` | 200,000 | 300,000 | RANDOM | random 3-regular graph, weights 1–100 | 14,917,537 | 1.1347 | 1.0339 | 1.0306 |
+| `gnm200k` | 200,000 | 300,000 | RANDOM | sparse Erdős–Rényi, average degree 3, weights 1–100; degrees vary and some vertices are isolated | 14,654,742 | 1.1384 | 1.0400 | 1.0373 |
+| `tri400` | 160,000 | 480,000 | STRUCTURED | triangular lattice on a 400 × 400 torus, weights 1–100; every triangle must leave one edge uncut | 19,274,036 | 1.0993 | 1.0401 | 1.0378 |
+| `tri900` | 810,000 | 2,430,000 | STRUCTURED | the same lattice on a 900 × 900 torus | 97,546,378 | 1.0999 | 1.0454 | 1.0397 |
+| `geo20k` | 20,000 | 118,572 | STRUCTURED | random points in a square, pairs within a radius joined, closer pairs heavier; dense local clusters | 3,761,949 | 1.0583 | 1.0185 | 1.0179 |
 
 *foundation* is the unmodified starting code; *reference* is the instructor's
 own solver (a simulated annealing over single-vertex moves, then local
@@ -224,7 +225,7 @@ badge on the board.
 Each instance is two files in `instances/`: `<name>.mc` (the graph) and
 `<name>.meta.json` (the bound, the reference cuts, the file's SHA-256, and how
 the graph was made). All weights are positive integers. The six scored `.mc`
-files total 370 MB and are fetched by `scripts/download.sh` from the GitHub
+files total 61 MB and are fetched by `scripts/download.sh` from the GitHub
 Release; the meta files and the `dev_*` graphs are in the repo.
 
 **The final grading uses fresh graphs** generated by the same code with the
@@ -286,11 +287,11 @@ bound them:
 
 ```sh
 make tools                                          # builds tools/gen/gen and tools/bound/bound
-python3 -m tools.gen --instance reg800k --seed 12345 --out mydata
-tools/bound/bound mydata/reg800k.mc --json          # prints {"upper_bound": ...}
+python3 -m tools.gen --instance reg200k --seed 12345 --out mydata
+tools/bound/bound mydata/reg200k.mc --json          # prints {"upper_bound": ...}
 ```
 
-Put the `upper_bound` into `mydata/reg800k.meta.json`, list the instance in
+Put the `upper_bound` into `mydata/reg200k.meta.json`, list the instance in
 your own instances file in the same `<category> <file.mc> <seconds>` format,
 and point `--instances` at it.
 

@@ -1,0 +1,32 @@
+{
+  "name": "geo20k",
+  "family": "geo",
+  "category": "STRUCTURED",
+  "time_limit_s": 60,
+  "seed": 20261001,
+  "params": {
+    "n": 20000,
+    "deg": 12,
+    "wmax": 100
+  },
+  "description": "Random geometric graph: 20,000 points in a square, pairs within a radius joined (average degree 12), closer pairs heavier. Dense local clusters of triangles.",
+  "n": 20000,
+  "m": 118572,
+  "total_weight": 6013172,
+  "weighted": true,
+  "deg_min": 0,
+  "deg_max": 28,
+  "instance_sha256": "513cc3728c77dd2550b3626338dffeb454cbd99afc94a6f1685dae800f52a73e",
+  "upper_bound": 3761949,
+  "lambda_max": 752.314604585,
+  "sdp_primal": 3761401.251,
+  "foundation_cut": 3554765,
+  "foundation_ratio": 1.05828,
+  "ref_cut": 3695883,
+  "ref_ratio": 1.01788,
+  "ref60_ratio": 1.01854,
+  "ref_seconds": 300,
+  "ref60_cut": 3693464,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

@@ -1,0 +1,32 @@
+{
+  "name": "dev_geo4k",
+  "family": "geo",
+  "category": "STRUCTURED",
+  "time_limit_s": 10,
+  "seed": 20261001,
+  "params": {
+    "n": 4000,
+    "deg": 12,
+    "wmax": 100
+  },
+  "description": "dev tier",
+  "n": 4000,
+  "m": 23281,
+  "total_weight": 1182478,
+  "weighted": true,
+  "deg_min": 1,
+  "deg_max": 28,
+  "instance_sha256": "e307bb1e026811262e757f7c168b4a5312b9c017f98164f1a64eeb85cdb4b919",
+  "upper_bound": 740810,
+  "lambda_max": 740.736917425,
+  "sdp_primal": 740710.33,
+  "foundation_cut": 700615,
+  "foundation_ratio": 1.05737,
+  "ref_cut": 727524,
+  "ref_ratio": 1.01826,
+  "ref60_ratio": 1.01863,
+  "ref_seconds": 30,
+  "ref60_cut": 727263,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

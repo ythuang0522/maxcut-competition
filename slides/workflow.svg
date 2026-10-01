@@ -32,12 +32,12 @@
   <text x="40" y="240" class="s lbl">WE PROVIDE</text>
   <rect x="40" y="254" width="300" height="230" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
   <text x="60" y="284" class="s h">6 graphs</text>
-  <text x="60" y="310" class="m tt">reg800k   800,000 / 4.0M  (regular)</text>
-  <text x="60" y="332" class="m tt">gnm600k   600,000 / 4.8M  (weighted)</text>
-  <text x="60" y="354" class="m tt">pow600k   600,000 / 3.6M  (hubs)</text>
-  <text x="60" y="376" class="m tt">tri900    810,000 / 2.4M  (lattice)</text>
-  <text x="60" y="398" class="m tt">geo600k   600,000 / 3.6M  (geometric)</text>
-  <text x="60" y="420" class="m tt">comm600k  600,000 / 4.8M  (communities)</text>
+  <text x="60" y="310" class="m tt">reg200k   200,000 / 0.3M  (3-regular)</text>
+  <text x="60" y="332" class="m tt">regw200k  200,000 / 0.3M  (3-reg, weighted)</text>
+  <text x="60" y="354" class="m tt">gnm200k   200,000 / 0.3M  (sparse G(n,m))</text>
+  <text x="60" y="376" class="m tt">tri400    160,000 / 0.5M  (lattice)</text>
+  <text x="60" y="398" class="m tt">tri900    810,000 / 2.4M  (lattice)</text>
+  <text x="60" y="420" class="m tt">geo20k     20,000 / 0.1M  (geometric)</text>
   <text x="60" y="452" class="s sm">vertices / edges, each with a PROVEN</text>
   <text x="60" y="470" class="s sm">upper bound on its maximum cut</text>
 
@@ -63,14 +63,14 @@
   <rect x="840" y="66" width="520" height="418" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
   <text x="860" y="96" class="m th">instance        cut      bound    ratio     gap  note</text>
   <line x1="860" y1="106" x2="1340" y2="106" stroke="#CBD5E1"/>
-  <text x="860" y="130" class="m tt">reg800k      2942572    3208968  <tspan class="good">1.0905</tspan>   9.05%  ok</text>
-  <text x="860" y="154" class="m tt">gnm600k    172551504  186761697  <tspan class="good">1.0824</tspan>   8.24%  ok</text>
-  <text x="860" y="178" class="m tt">pow600k      2526743    2740392  <tspan class="good">1.0846</tspan>   8.46%  ok</text>
-  <text x="860" y="202" class="m tt">tri900             -   97572848  <tspan class="bad">2.0000</tspan>       -  TIMEOUT</text>
-  <text x="860" y="226" class="m tt">geo600k    111192062  113514185  <tspan class="good">1.0209</tspan>   2.09%  ok</text>
-  <text x="860" y="250" class="m tt">comm600k     3289761    3546657  <tspan class="good">1.0781</tspan>   7.81%  ok</text>
+  <text x="860" y="130" class="m tt">reg200k      276055     291519  <tspan class="good">1.0560</tspan>   5.60%  ok</text>
+  <text x="860" y="154" class="m tt">regw200k   14428020   14917537  <tspan class="good">1.0339</tspan>   3.39%  ok</text>
+  <text x="860" y="178" class="m tt">gnm200k    14091679   14654742  <tspan class="good">1.0400</tspan>   4.00%  ok</text>
+  <text x="860" y="202" class="m tt">tri400     18531758   19274036  <tspan class="good">1.0401</tspan>   4.01%  ok</text>
+  <text x="860" y="226" class="m tt">tri900            -   97546378  <tspan class="bad">2.0000</tspan>       -  TIMEOUT</text>
+  <text x="860" y="250" class="m tt">geo20k      3693464    3761949  <tspan class="good">1.0185</tspan>   1.85%  ok</text>
   <line x1="860" y1="266" x2="1340" y2="266" stroke="#CBD5E1"/>
-  <text x="860" y="294" class="m tt">Overall geomean ratio = <tspan class="acc" style="font-size:16px">1.1885</tspan>   &lt;- your score</text>
+  <text x="860" y="294" class="m tt">Overall geomean ratio = <tspan class="acc" style="font-size:16px">1.1576</tspan>   &lt;- your score</text>
   <text x="860" y="318" class="s sm">lower is better · 1.0000 would be provably optimal everywhere</text>
   <text x="860" y="336" class="s sm">a failed instance counts as 2.0 (here: TIMEOUT on tri900)</text>
 

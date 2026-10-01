@@ -19,7 +19,7 @@ TAG="${RELEASE_TAG:-v1.0}"
 cd "$(dirname "$0")/.."
 mkdir -p instances
 
-names=(reg800k gnm600k pow600k tri900 geo600k comm600k)
+names=(reg200k regw200k gnm200k tri400 tri900 geo20k)
 sums="checksums/scored.sha256"
 
 sha256_of() {
@@ -28,7 +28,7 @@ sha256_of() {
   fi
 }
 
-echo "Downloading the scored graphs from ${REPO} @ ${TAG} (about 130 MB compressed, 370 MB on disk) ..."
+echo "Downloading the scored graphs from ${REPO} @ ${TAG} (about 25 MB compressed, 61 MB on disk) ..."
 for name in "${names[@]}"; do
   dest="instances/${name}.mc"
   if [[ -f "$dest" ]]; then

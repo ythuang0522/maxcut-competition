@@ -1,0 +1,32 @@
+{
+  "name": "regw200k",
+  "family": "regular",
+  "category": "RANDOM",
+  "time_limit_s": 60,
+  "seed": 20261001,
+  "params": {
+    "n": 200000,
+    "d": 3,
+    "wmax": 100
+  },
+  "description": "Random 3-regular graph on 200,000 vertices, weights 1-100.",
+  "n": 200000,
+  "m": 300000,
+  "total_weight": 15186515,
+  "weighted": true,
+  "deg_min": 3,
+  "deg_max": 3,
+  "instance_sha256": "0446d809443f7bf848c5787c69b4aa73b5ee062872ff262d687f714f8f29b872",
+  "upper_bound": 14917537,
+  "lambda_max": 298.320912319,
+  "sdp_primal": 14905076.973,
+  "foundation_cut": 13146679,
+  "foundation_ratio": 1.1347,
+  "ref_cut": 14475018,
+  "ref_ratio": 1.03057,
+  "ref60_ratio": 1.03393,
+  "ref_seconds": 300,
+  "ref60_cut": 14428020,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

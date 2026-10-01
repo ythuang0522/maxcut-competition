@@ -1,0 +1,31 @@
+{
+  "name": "tri400",
+  "family": "tri",
+  "category": "STRUCTURED",
+  "time_limit_s": 60,
+  "seed": 20261001,
+  "params": {
+    "L": 400,
+    "wmax": 100
+  },
+  "description": "Triangular lattice on a 400 x 400 torus (160,000 vertices, degree 6), weights 1-100. Every triangle must leave one edge uncut: a frustrated antiferromagnet.",
+  "n": 160000,
+  "m": 480000,
+  "total_weight": 24244888,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "fb463c2cbf4d22aa95d116f4f6cc61fce1f2dff4cfc55d2ef7429d9bdb28c57c",
+  "upper_bound": 19274036,
+  "lambda_max": 481.802731772,
+  "sdp_primal": 19270417.229,
+  "foundation_cut": 17532834,
+  "foundation_ratio": 1.09931,
+  "ref_cut": 18571567,
+  "ref_ratio": 1.03782,
+  "ref60_ratio": 1.04005,
+  "ref_seconds": 300,
+  "ref60_cut": 18531758,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}
