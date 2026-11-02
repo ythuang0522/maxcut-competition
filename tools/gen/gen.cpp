@@ -22,6 +22,25 @@
 //                                 grid plus one diagonal), random weights: a
 //                                 frustrated antiferromagnet -- every triangle
 //                                 must leave one edge uncut.
+//   tritail   L= [wmax=100] [tail=3] [relabel_seed= weight_seed=]
+//                                 the same triangular lattice (degree 6), with
+//                                 heavy-tailed weights w = 1 + floor(wmax u^tail),
+//                                 u uniform with 20 bits: most edges light, a few
+//                                 heavy. Built in three stages, each reproducible
+//                                 on its own: (1) the tri graph with the same
+//                                 seed, L and wmax; (2) its labels shuffled again
+//                                 by a stream seeded with relabel_seed; (3) one
+//                                 20-bit draw per edge, in output order, from a
+//                                 stream seeded with weight_seed. Without the two
+//                                 sub-seeds they are drawn from the main stream.
+//   dlat      L= m= [pdel=250] [pglob=500] [R=4] [wmax=100] [tail=3]
+//                                 irregular frustrated lattice: the triangular
+//                                 lattice on an L x L torus, each lattice edge
+//                                 deleted with probability pdel/1000, then extra
+//                                 edges until there are m: a fraction pglob/1000
+//                                 join two uniform random vertices, the rest join
+//                                 a vertex to a random vertex of its (2R+1)^2
+//                                 box. Heavy-tailed weights as in tritail.
 //   geo       n= deg= [wmax=100]  random geometric graph in a square: points
 //                                 within radius r are joined, heavier when
 //                                 closer. deg is the target average degree.
@@ -61,6 +80,9 @@ struct Rng {
     u64 below(u64 k) { return ((next() >> 32) * k) >> 32; }
     // uniform in [lo, hi]
     i64 range(i64 lo, i64 hi) { return lo + (i64)below((u64)(hi - lo + 1)); }
+    // uniform in [0, k) from the top 53 bits by modulo (bias < 2^-30 for
+    // k < 2^23); the tritail relabelling stage uses this one
+    u64 below_mod(u64 k) { return (next() >> 11) % k; }
 };
 
 static u64 fnv(const std::string& s) {
@@ -189,6 +211,87 @@ static Graph gen_tri(Rng& rng, uint32_t L) {
     return g;
 }
 
+// 1 + floor(wmax * u^tail) with u = k / 2^20, k a 20-bit draw (the top 20
+// bits of one splitmix64 output). tail=1 is uniform; tail=3 makes most edges
+// light and a few heavy.
+static i64 tail_weight(Rng& rng, i64 wmax, int tail) {
+    __int128 u = (__int128)rng.below((u64)1 << 20), p = 1;
+    for (int k = 0; k < tail; ++k) p *= u;
+    return 1 + (i64)(((__int128)wmax * p) >> (20 * tail));
+}
+
+static void check_tail(int tail) {
+    if (tail < 1 || tail > 4) { std::fprintf(stderr, "need 1 <= tail <= 4\n"); std::exit(2); }
+}
+
+// Stage 1 of tritail: exactly what  gen tri <seed> L=<L> wmax=<wmax>  writes
+// (its own stream, its own weights, relabelled and sorted). Returns the main
+// stream positioned after the tri stage, for drawing default sub-seeds.
+static Graph tri_stage(u64 seed, uint32_t L, i64 wmax, Rng& after) {
+    std::string tag = "tri|" + std::to_string(seed) + "|L=" + std::to_string(L) + "|wmax=" + std::to_string(wmax);
+    Rng rng(fnv(tag) ^ (seed * 0x9E3779B97F4A7C15ULL));
+    Graph g = gen_tri(rng, L);
+    assign_weights(g, rng, wmax);
+    relabel(g, rng);
+    finish(g);
+    after = rng;
+    return g;
+}
+
+static Graph gen_tritail(u64 seed, uint32_t L, i64 wmax, int tail, bool have_rs, u64 relabel_seed,
+                         bool have_ws, u64 weight_seed) {
+    check_tail(tail);
+    Rng main_rng(0);
+    Graph g = tri_stage(seed, L, wmax, main_rng);
+    if (!have_rs) relabel_seed = main_rng.next();
+    if (!have_ws) weight_seed = main_rng.next();
+    // stage 2: Fisher-Yates permutation from splitmix64(relabel_seed)
+    Rng rr(relabel_seed);
+    vector<uint32_t> perm(g.n);
+    for (uint32_t i = 0; i < g.n; ++i) perm[i] = i;
+    for (uint32_t i = g.n - 1; i > 0; --i) std::swap(perm[i], perm[rr.below_mod(i + 1)]);
+    for (Edge& e : g.edges) {
+        e.u = perm[e.u]; e.v = perm[e.v];
+        if (e.u > e.v) std::swap(e.u, e.v);
+    }
+    finish(g);
+    // stage 3: one draw per edge in output order from splitmix64(weight_seed)
+    Rng wr(weight_seed);
+    for (Edge& e : g.edges) e.w = tail_weight(wr, wmax, tail);
+    return g;
+}
+
+static Graph gen_dlat(Rng& rng, uint32_t L, u64 m, i64 pdel, i64 pglob, int R, i64 wmax, int tail) {
+    check_tail(tail);
+    if (L < 4) { std::fprintf(stderr, "dlat: need L >= 4\n"); std::exit(2); }
+    Graph g; g.n = L * L;
+    for (uint32_t i = 0; i < L; ++i)
+        for (uint32_t j = 0; j < L; ++j) {
+            uint32_t v = i * L + j;
+            uint32_t nb[3] = {i * L + (j + 1) % L, ((i + 1) % L) * L + j, ((i + 1) % L) * L + (j + 1) % L};
+            for (uint32_t x : nb) {
+                if ((i64)rng.below(1000) < pdel) continue;
+                g.add(v, x, tail_weight(rng, wmax, tail));
+            }
+        }
+    if (m < g.edges.size()) {
+        std::fprintf(stderr, "dlat: m=%llu is below the %zu lattice edges kept\n", (unsigned long long)m, g.edges.size());
+        std::exit(2);
+    }
+    while (g.edges.size() < m) {
+        uint32_t u = (uint32_t)rng.below(g.n), v;
+        bool glob = (i64)rng.below(1000) < pglob;
+        if (glob) v = (uint32_t)rng.below(g.n);
+        else {
+            int i = (int)(u / L), j = (int)(u % L);
+            int di = (int)rng.range(-R, R), dj = (int)rng.range(-R, R);
+            v = (uint32_t)(((i + di + (int)L) % (int)L) * (int)L + (j + dj + (int)L) % (int)L);
+        }
+        g.add(u, v, tail_weight(rng, wmax, tail));
+    }
+    return g;
+}
+
 // Points on a 2^20 x 2^20 square; join pairs within radius r, weight grows
 // with proximity: w = 1 + wmax * (r^2 - d^2) / r^2 (integer arithmetic).
 static Graph gen_geo(Rng& rng, uint32_t n, uint32_t deg, i64 wmax) {
@@ -245,6 +348,16 @@ static i64 arg(const std::vector<std::pair<std::string, std::string>>& kv, const
     return dflt;
 }
 
+static bool has_arg(const std::vector<std::pair<std::string, std::string>>& kv, const char* k) {
+    for (auto& p : kv) if (p.first == k) return true;
+    return false;
+}
+
+static u64 uarg(const std::vector<std::pair<std::string, std::string>>& kv, const char* k) {
+    for (auto& p : kv) if (p.first == k) return std::strtoull(p.second.c_str(), nullptr, 10);
+    return 0;
+}
+
 int main(int argc, char** argv) {
     if (argc < 4) {
         std::fprintf(stderr, "usage: gen <family> <seed> <out.mc> [key=value ...]\n");
@@ -278,6 +391,17 @@ int main(int argc, char** argv) {
     } else if (family == "tri") {
         g = gen_tri(rng, (uint32_t)arg(kv, "L", 0, true));
         wmax = arg(kv, "wmax", 100);
+    } else if (family == "tritail") {
+        wmax = arg(kv, "wmax", 100);
+        g = gen_tritail(seed, (uint32_t)arg(kv, "L", 0, true), wmax, (int)arg(kv, "tail", 3),
+                        has_arg(kv, "relabel_seed"), uarg(kv, "relabel_seed"),
+                        has_arg(kv, "weight_seed"), uarg(kv, "weight_seed"));
+        wmax = 0;                                  // weights and labels already final
+    } else if (family == "dlat") {
+        wmax = arg(kv, "wmax", 100);
+        g = gen_dlat(rng, (uint32_t)arg(kv, "L", 0, true), (u64)arg(kv, "m", 0, true), arg(kv, "pdel", 250),
+                     arg(kv, "pglob", 500), (int)arg(kv, "R", 4), wmax, (int)arg(kv, "tail", 3));
+        wmax = 0;                                  // weights already set
     } else if (family == "geo") {
         wmax = arg(kv, "wmax", 100);
         g = gen_geo(rng, (uint32_t)arg(kv, "n", 0, true), (uint32_t)arg(kv, "deg", 0, true), wmax);
@@ -291,7 +415,8 @@ int main(int argc, char** argv) {
         return 2;
     }
     if (wmax > 0) assign_weights(g, rng, wmax);
-    if (family != "geo") relabel(g, rng);          // geo has no index structure to hide
+    // geo has no index structure to hide; tritail is relabelled by its own stages
+    if (family != "geo" && family != "tritail") relabel(g, rng);
     finish(g);
 
     std::FILE* f = std::fopen(out, "w");

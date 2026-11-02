@@ -1,0 +1,32 @@
+{
+  "name": "dev_tri60tail",
+  "family": "tritail",
+  "category": "STRUCTURED",
+  "time_limit_s": 10,
+  "seed": 20261001,
+  "params": {
+    "L": 60,
+    "wmax": 100,
+    "tail": 3
+  },
+  "description": "dev tier",
+  "n": 3600,
+  "m": 10800,
+  "total_weight": 277770,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "72ebf05e708dd8559c84d8bb67fcff07cf61bdfe393f4cd664a07cad66336bfe",
+  "upper_bound": 244260,
+  "lambda_max": 271.373786764,
+  "sdp_primal": 244216.498,
+  "foundation_cut": 221868,
+  "foundation_ratio": 1.10092,
+  "ref_cut": 239450,
+  "ref_ratio": 1.02009,
+  "ref60_ratio": 1.02133,
+  "ref_seconds": 30,
+  "ref60_cut": 239158,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

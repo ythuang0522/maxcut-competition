@@ -11,6 +11,12 @@ tools/gen/gen (integer arithmetic only, so every machine produces the same
 bytes). When the manifest's own seed is used, the SHA-256 of each generated
 file is checked against checksums/*.sha256.
 
+Some shipped graphs carry a "published" block in the manifest: the exact
+seed and extra parameters that made the shipped file (dlat400 keeps the seed
+it was selected with; tri400tail pins the sub-seeds of its relabelling and
+weight stages). It applies only when the manifest's own seed is in force; with
+--seed you get a fresh graph of the same family and parameters.
+
 A <name>.meta.json is written beside each <name>.mc with the parameters and
 the digest. The proven upper bound and the reference cut are added by
 tools/pipeline.py (instructor) and are already in the committed meta files;
@@ -50,12 +56,22 @@ def expected_digests():
     return out
 
 
-def generate(spec, seed, out_dir, check):
+def resolve(spec, seed, manifest_seed):
+    """The seed and parameters that make this instance: the manifest's
+    "published" block applies only when the manifest's own seed is used."""
+    pub = spec.get("published") if seed == manifest_seed else None
+    if not pub:
+        return seed, dict(spec["params"])
+    return pub.get("seed", seed), {**spec["params"], **pub.get("params", {})}
+
+
+def generate(spec, seed, out_dir, check, manifest_seed=None):
     name = spec["name"]
     out_dir.mkdir(parents=True, exist_ok=True)
     mc = out_dir / f"{name}.mc"
     meta_path = out_dir / f"{name}.meta.json"
-    params = [f"{k}={v}" for k, v in spec["params"].items()]
+    seed, all_params = resolve(spec, seed, manifest_seed)
+    params = [f"{k}={v}" for k, v in all_params.items()]
     r = subprocess.run([str(GEN), spec["family"], str(seed), str(mc), *params],
                        capture_output=True, text=True)
     if r.returncode != 0:
@@ -71,7 +87,7 @@ def generate(spec, seed, out_dir, check):
         "category": spec["category"],
         "time_limit_s": spec["time_limit_s"],
         "seed": seed,
-        "params": spec["params"],
+        "params": all_params,
         "description": spec.get("description", ""),
         "n": stats["n"], "m": stats["m"],
         "total_weight": stats["total_weight"],
@@ -117,7 +133,7 @@ def main(argv=None):
     for spec in manifest["instances"]:
         if args.instance and spec["name"] != args.instance:
             continue
-        generate(spec, seed, args.out, check)
+        generate(spec, seed, args.out, check, manifest["seed"])
     return 0
 
 

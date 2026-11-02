@@ -37,26 +37,41 @@
       "description": "Sparse Erdos-Renyi graph, 200,000 vertices and 300,000 edges (average degree 3), weights 1-100; degrees vary and some vertices are isolated."
     },
     {
-      "name": "tri400",
-      "family": "tri",
+      "name": "tri400tail",
+      "family": "tritail",
       "category": "STRUCTURED",
       "time_limit_s": 60,
       "params": {
         "L": 400,
-        "wmax": 100
+        "wmax": 100,
+        "tail": 3
       },
-      "description": "Triangular lattice on a 400 x 400 torus (160,000 vertices, degree 6), weights 1-100. Every triangle must leave one edge uncut: a frustrated antiferromagnet."
+      "published": {
+        "params": {
+          "relabel_seed": 9101,
+          "weight_seed": 7101
+        }
+      },
+      "description": "Triangular lattice on a 400 x 400 torus (160,000 vertices, degree 6) with heavy-tailed weights 1-100: w = 1 + floor(100 u^3), so most edges are light and a few are heavy. Every triangle must leave one edge uncut: a frustrated antiferromagnet."
     },
     {
-      "name": "tri900",
-      "family": "tri",
+      "name": "dlat400",
+      "family": "dlat",
       "category": "STRUCTURED",
       "time_limit_s": 60,
       "params": {
-        "L": 900,
-        "wmax": 100
+        "L": 400,
+        "pdel": 100,
+        "m": 480000,
+        "pglob": 200,
+        "R": 4,
+        "wmax": 100,
+        "tail": 3
       },
-      "description": "The same lattice on a 900 x 900 torus (810,000 vertices)."
+      "published": {
+        "seed": 101
+      },
+      "description": "Irregular frustrated lattice: the 400 x 400 triangular torus with 10% of its edges deleted at random, then extra edges up to 480,000 (80% to a random vertex within 4 rows and columns, 20% between two random vertices). Degrees vary (0-12); heavy-tailed weights 1-100 as in tri400tail."
     },
     {
       "name": "geo20k",
@@ -106,24 +121,30 @@
       "description": "dev tier"
     },
     {
-      "name": "dev_tri60",
-      "family": "tri",
+      "name": "dev_tri60tail",
+      "family": "tritail",
       "category": "STRUCTURED",
       "time_limit_s": 10,
       "params": {
         "L": 60,
-        "wmax": 100
+        "wmax": 100,
+        "tail": 3
       },
       "description": "dev tier"
     },
     {
-      "name": "dev_tri100",
-      "family": "tri",
+      "name": "dev_dlat100",
+      "family": "dlat",
       "category": "STRUCTURED",
       "time_limit_s": 10,
       "params": {
         "L": 100,
-        "wmax": 100
+        "pdel": 100,
+        "m": 30000,
+        "pglob": 200,
+        "R": 4,
+        "wmax": 100,
+        "tail": 3
       },
       "description": "dev tier"
     },

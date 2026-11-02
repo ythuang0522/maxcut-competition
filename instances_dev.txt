@@ -3,6 +3,6 @@
 RANDOM      instances/dev_reg10k.mc   10
 RANDOM      instances/dev_regw10k.mc  10
 RANDOM      instances/dev_gnm10k.mc   10
-STRUCTURED  instances/dev_tri60.mc    10
-STRUCTURED  instances/dev_tri100.mc   10
+STRUCTURED  instances/dev_tri60tail.mc 10
+STRUCTURED  instances/dev_dlat100.mc  10
 STRUCTURED  instances/dev_geo4k.mc    10

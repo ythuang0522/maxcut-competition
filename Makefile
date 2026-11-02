@@ -14,7 +14,7 @@ ifeq ($(UNAME_S),Darwin)
     endif
 endif
 
-.PHONY: all foundation solver tools instances test check-data clean
+.PHONY: all foundation solver tools instances test dataset-check check-data clean
 
 all: foundation
 
@@ -28,7 +28,7 @@ solver: solver.cpp
 
 # --- instances ---------------------------------------------------------------
 
-# The six scored graphs (370 MB) are fetched from the GitHub Release and
+# The six scored graphs (30 MB) are fetched from the GitHub Release and
 # checked against checksums/scored.sha256. The dev graphs are in the repo.
 instances:
 	scripts/download.sh
@@ -51,6 +51,12 @@ tools/ref/solvers/refsolve: tools/ref/solvers/refsolve.cpp
 # the enforced time/memory/thread limits).
 test: foundation
 	python3 tools/test_grade.py
+
+# Three quick dataset checks: the two v1.1 graphs regenerate exactly,
+# scripts/download.sh recovers and aborts correctly (offline), and the six
+# scored graphs agree across instances.txt, metas, checksums and download.sh.
+dataset-check: tools/gen/gen
+	python3 tools/test_dataset.py
 
 # Verify every instance against its meta file (digest, n/m, the stored bound
 # is not below the reference cut, the bound tool reproduces it) -- slow.

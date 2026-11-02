@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GRADE = ROOT / "grade.py"
 FOUNDATION = ROOT / "foundation"
 INST = ("RANDOM", ROOT / "instances/dev_reg10k.mc", 5)
-INST2 = ("STRUCTURED", ROOT / "instances/dev_tri100.mc", 5)
+INST2 = ("STRUCTURED", ROOT / "instances/dev_dlat100.mc", 5)
 
 PASS, FAIL = [], []
 
