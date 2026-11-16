@@ -9,7 +9,8 @@
 // generator uses integer arithmetic only (a splitmix64 stream, no libm, no
 // floating point), so the bytes are identical on every platform and compiler.
 //
-// Families (all weights are positive integers; an edge appears once, u < v):
+// Families (an edge appears once, u < v; weights are positive integers unless
+// a sign option below is given):
 //
 //   regular   n= d= [wmax=1]      random d-regular simple graph (pairing model
 //                                 with repairs). Unweighted by default.
@@ -44,13 +45,25 @@
 //   geo       n= deg= [wmax=100]  random geometric graph in a square: points
 //                                 within radius r are joined, heavier when
 //                                 closer. deg is the target average degree.
+//   cubic     L= [wmax=1]       simple cubic lattice on an L x L x L torus
+//                                 (degree 6). Bipartite for even L, so it is
+//                                 only interesting with signed weights: with
+//                                 neg=500 it is the 3D Edwards-Anderson spin
+//                                 glass.
 //   community n= m= K= pin= [wmax=1]   planted partition: a fraction pin/1000
 //                                 of the edges lie inside one of K hidden
 //                                 communities; vertex labels are shuffled.
 //
+// Sign options (any family, applied after the family's own weights, before
+// the labels are shuffled):
+//   gauss=S    replace every weight by the sum of four uniform draws in
+//              [-S, S], drawn again while it is 0 (a rounded bell curve,
+//              about half the edges negative)
+//   neg=P      then negate each weight with probability P/1000
+//
 // Output format (<out.mc>):
 //     n m
-//     u v w         (0 <= u < v < n, integer w >= 1, one edge per line)
+//     u v w         (0 <= u < v < n, integer w != 0, one edge per line)
 
 #include <algorithm>
 #include <cstdint>
@@ -195,6 +208,20 @@ static Graph gen_powerlaw(Rng& rng, uint32_t n, uint32_t k) {
             if (g.add(u, v, 1)) { ends.push_back(u); ends.push_back(v); ++added; }
         }
     }
+    return g;
+}
+
+static Graph gen_cubic(uint32_t L) {
+    if (L < 3) { std::fprintf(stderr, "need L >= 3\n"); std::exit(2); }
+    Graph g; g.n = L * L * L;
+    for (uint32_t x = 0; x < L; ++x)
+        for (uint32_t y = 0; y < L; ++y)
+            for (uint32_t z = 0; z < L; ++z) {
+                uint32_t v = (x * L + y) * L + z;
+                g.add(v, (((x + 1) % L) * L + y) * L + z, 1);
+                g.add(v, (x * L + (y + 1) % L) * L + z, 1);
+                g.add(v, (x * L + y) * L + (z + 1) % L, 1);
+            }
     return g;
 }
 
@@ -406,6 +433,9 @@ int main(int argc, char** argv) {
         wmax = arg(kv, "wmax", 100);
         g = gen_geo(rng, (uint32_t)arg(kv, "n", 0, true), (uint32_t)arg(kv, "deg", 0, true), wmax);
         wmax = 0;                                  // weights already set by distance
+    } else if (family == "cubic") {
+        g = gen_cubic((uint32_t)arg(kv, "L", 0, true));
+        wmax = arg(kv, "wmax", 1);
     } else if (family == "community") {
         g = gen_community(rng, (uint32_t)arg(kv, "n", 0, true), (u64)arg(kv, "m", 0, true),
                           (uint32_t)arg(kv, "K", 0, true), (uint32_t)arg(kv, "pin", 800));
@@ -415,6 +445,15 @@ int main(int argc, char** argv) {
         return 2;
     }
     if (wmax > 0) assign_weights(g, rng, wmax);
+    if (has_arg(kv, "gauss")) {
+        i64 S = arg(kv, "gauss", 0);
+        if (S < 1) { std::fprintf(stderr, "need gauss >= 1\n"); return 2; }
+        for (Edge& e : g.edges) {
+            do { e.w = 0; for (int k = 0; k < 4; ++k) e.w += rng.range(-S, S); } while (e.w == 0);
+        }
+    }
+    if (i64 neg = arg(kv, "neg", 0); neg > 0)
+        for (Edge& e : g.edges) if ((i64)rng.below(1000) < neg) e.w = -e.w;
     // geo has no index structure to hide; tritail is relabelled by its own stages
     if (family != "geo" && family != "tritail") relabel(g, rng);
     finish(g);
@@ -422,7 +461,7 @@ int main(int argc, char** argv) {
     std::FILE* f = std::fopen(out, "w");
     if (!f) { std::fprintf(stderr, "cannot write %s\n", out); return 1; }
     std::fprintf(f, "%u %zu\n", g.n, g.edges.size());
-    i64 W = 0, wmin = 1LL << 62, wmx = 0;
+    i64 W = 0, wmin = 1LL << 62, wmx = -(1LL << 62);
     vector<uint32_t> deg(g.n, 0);
     for (const Edge& e : g.edges) {
         std::fprintf(f, "%u %u %lld\n", e.u, e.v, (long long)e.w);

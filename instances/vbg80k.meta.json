@@ -1,0 +1,32 @@
+{
+  "name": "vbg80k",
+  "family": "regular",
+  "category": "SIGNED",
+  "time_limit_s": 30,
+  "seed": 20261116,
+  "params": {
+    "n": 80000,
+    "d": 3,
+    "gauss": 25
+  },
+  "description": "Random 3-regular graph on 80,000 vertices with the same bell-shaped signed weights as tri200g.",
+  "n": 80000,
+  "m": 120000,
+  "total_weight": 1490,
+  "weighted": true,
+  "deg_min": 3,
+  "deg_max": 3,
+  "instance_sha256": "a3b6db738988aea3cd55ead53fda44c84bfc0e1d6e58da10a4be8f96a998ffcf",
+  "upper_bound": 1400885,
+  "lambda_max": 70.037272058,
+  "sdp_primal": 1399119.456,
+  "foundation_cut": 1079270,
+  "foundation_ratio": 1.29799,
+  "ref_cut": 1337209,
+  "ref_ratio": 1.04762,
+  "ref60_ratio": 1.04916,
+  "ref_seconds": 300,
+  "ref60_cut": 1335240,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

@@ -1,0 +1,32 @@
+{
+  "name": "tri200s4",
+  "family": "tritail",
+  "category": "SIGNED",
+  "time_limit_s": 30,
+  "seed": 20261116,
+  "params": {
+    "L": 200,
+    "tail": 4,
+    "neg": 500
+  },
+  "description": "Signed triangular lattice on a 200 x 200 torus (40,000 vertices): magnitudes 1 + floor(100 u^4), heavier-tailed than tri300s (most edges very light, a few heavy), random signs.",
+  "n": 40000,
+  "m": 120000,
+  "total_weight": -1020,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "ba4147eb993e12207098d978c66bc5b4e3dd0e338db77e45206e3f62ea5262c6",
+  "upper_bound": 1049436,
+  "lambda_max": 104.933164589,
+  "sdp_primal": 1049145.133,
+  "foundation_cut": 857703,
+  "foundation_ratio": 1.22354,
+  "ref_cut": 1020194,
+  "ref_ratio": 1.02866,
+  "ref60_ratio": 1.03004,
+  "ref_seconds": 300,
+  "ref60_cut": 1018826,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

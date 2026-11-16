@@ -1,0 +1,32 @@
+{
+  "name": "dev_tri60s4",
+  "family": "tritail",
+  "category": "SIGNED",
+  "time_limit_s": 10,
+  "seed": 20261116,
+  "params": {
+    "L": 60,
+    "tail": 4,
+    "neg": 500
+  },
+  "description": "dev tier",
+  "n": 3600,
+  "m": 10800,
+  "total_weight": -639,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "04b37c29f457e9b6117bced9a9cac1309420e6b03e5cebdade8e91c51525c02f",
+  "upper_bound": 93943,
+  "lambda_max": 104.371766826,
+  "sdp_primal": 93918.536,
+  "foundation_cut": 76503,
+  "foundation_ratio": 1.22796,
+  "ref_cut": 91410,
+  "ref_ratio": 1.02771,
+  "ref60_ratio": 1.02723,
+  "ref_seconds": 30,
+  "ref60_cut": 91453,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

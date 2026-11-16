@@ -1,7 +1,7 @@
 {
   "name": "dev_tri60tail",
   "family": "tritail",
-  "category": "STRUCTURED",
+  "category": "POSITIVE",
   "time_limit_s": 10,
   "seed": 20261001,
   "params": {
@@ -22,11 +22,11 @@
   "sdp_primal": 244216.498,
   "foundation_cut": 221868,
   "foundation_ratio": 1.10092,
-  "ref_cut": 239450,
-  "ref_ratio": 1.02009,
-  "ref60_ratio": 1.02133,
+  "ref_cut": 239974,
+  "ref_ratio": 1.01786,
+  "ref60_ratio": 1.01842,
   "ref_seconds": 30,
-  "ref60_cut": 239158,
+  "ref60_cut": 239842,
   "bound_rank": 20,
   "bound_sweeps": 1500
 }

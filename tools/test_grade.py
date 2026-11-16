@@ -9,6 +9,8 @@
   3. the time limit, the 4 GB cap and the single-thread rule are enforced
   4. one bad instance does not abort the run
   5. the two categories aggregate correctly
+  6. on a signed graph a cut of weight <= 0, or one so light that
+     upper_bound / cut exceeds 2.0, scores FAIL_RATIO (the cap)
 """
 
 import hashlib
@@ -21,8 +23,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 GRADE = ROOT / "grade.py"
 FOUNDATION = ROOT / "foundation"
-INST = ("RANDOM", ROOT / "instances/dev_reg10k.mc", 5)
-INST2 = ("STRUCTURED", ROOT / "instances/dev_dlat100.mc", 5)
+INST = ("SIGNED", ROOT / "instances/dev_vbg10k.mc", 5)
+INST2 = ("POSITIVE", ROOT / "instances/dev_dlat100.mc", 5)
 
 PASS, FAIL = [], []
 
@@ -60,7 +62,7 @@ def main():
         raise SystemExit("build the foundation first: make foundation")
     if not INST[1].exists():
         raise SystemExit("the dev graphs are missing: git checkout instances/")
-    meta = json.loads((ROOT / "instances/dev_reg10k.meta.json").read_text())
+    meta = json.loads((ROOT / "instances/dev_vbg10k.meta.json").read_text())
 
     with tempfile.TemporaryDirectory() as tmp:
         print("\n[1] foundation as the solver")
@@ -123,7 +125,7 @@ def main():
 
         print("\n[3] limits")
         res, _ = run_grade(tmp, stub(tmp, "slow.sh", f'"{FOUNDATION}" "$1" "$2" "$3"\nsleep 30\n'),
-                           instances=[("RANDOM", INST[1], 2)])
+                           instances=[("SIGNED", INST[1], 2)])
         check("time limit is enforced (valid cut written too late)",
               res["instances"][0]["note"] == "TIMEOUT", f"note={res['instances'][0]['note']}")
         check("a timed-out instance scores FAIL_RATIO", res["instances"][0]["ratio"] == 2.0)
@@ -133,7 +135,7 @@ def main():
                    'm=memoryview(b); c=os.urandom(1<<20)\n'
                    'for i in range(0, n, 1<<20): m[i:i+(1<<20)]=c\n'
                    'print(n)"\n')
-        res, _ = run_grade(tmp, hog, instances=[("RANDOM", INST[1], 60)])
+        res, _ = run_grade(tmp, hog, instances=[("SIGNED", INST[1], 60)])
         check("4 GB cap is enforced", res["instances"][0]["note"] in ("MEMORY", "CRASH"),
               f"note={res['instances'][0]['note']}")
 
@@ -151,15 +153,35 @@ def main():
         check("both instances reported", len(res["instances"]) == 2)
         check("both CRASH", all(i["note"] == "CRASH" for i in res["instances"]))
         check("category means are separate",
-              res["random_geomean"] == 2.0 and res["structured_geomean"] == 2.0)
+              res["positive_geomean"] == 2.0 and res["signed_geomean"] == 2.0)
 
         print("\n[5] two categories aggregate correctly")
         res, _ = run_grade(tmp, FOUNDATION, instances=[INST, INST2])
         r1, r2 = res["instances"][0]["ratio"], res["instances"][1]["ratio"]
-        check("random = first, structured = second",
-              abs(res["random_geomean"] - r1) < 1e-12 and abs(res["structured_geomean"] - r2) < 1e-12)
+        check("signed = first, positive = second",
+              abs(res["signed_geomean"] - r1) < 1e-12 and abs(res["positive_geomean"] - r2) < 1e-12)
         check("overall is the geometric mean",
               abs(res["overall_geomean"] - (r1 * r2) ** 0.5) < 1e-12)
+
+        print("\n[6] signed graphs: light cuts are capped at FAIL_RATIO")
+        n = int(INST[1].read_text().split(None, 1)[0])
+        zeros = stub(tmp, "zeros.sh", f'yes 0 | head -n {n} > "$2"\n')
+        res, _ = run_grade(tmp, zeros)
+        i0 = res["instances"][0]
+        check("all on one side: valid, weight 0, scores FAIL_RATIO",
+              i0["note"] == "ok" and i0["cut"] == 0 and i0["ratio"] == 2.0, f"{i0['note']} {i0['cut']} {i0['ratio']}")
+        # vertices 0..k-1 on side 1: a small cut, positive or negative
+        light = None
+        for k in range(1, 400):
+            one = stub(tmp, f"one{k}.sh", f'(yes 1 | head -n {k}; yes 0 | head -n {n - k}) > "$2"\n')
+            res, _ = run_grade(tmp, one)
+            i0 = res["instances"][0]
+            if i0["cut"] is not None and 0 < i0["cut"] < i0["upper_bound"] / 2:
+                light = i0
+                break
+        check("a light positive cut scores exactly FAIL_RATIO, not more",
+              light is not None and light["ratio"] == 2.0,
+              f"cut={light and light['cut']} ratio={light and light['ratio']}")
 
     print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
     if FAIL:

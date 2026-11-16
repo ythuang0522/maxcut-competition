@@ -8,6 +8,12 @@
 // makes the cut worse and ends at a cut that is at least half the total weight
 // deterministically. Students start from this file and make its cuts LARGER.
 //
+// Signed graphs: weights may be negative (a negative edge rewards keeping its
+// endpoints on the SAME side). The code below handles that unchanged -- the
+// gain of a move is still own-side weight minus other-side weight -- but the
+// 1/2 guarantee is gone: half the total weight can be about 0, so on a signed
+// graph a random cut is worth nothing and only the local search earns points.
+//
 // Usage:
 //     ./solver <instance.mc> <output.cut> <time_limit_seconds>
 //
@@ -19,7 +25,8 @@
 //
 //   <instance.mc>
 //     n m                          (vertices 0..n-1, number of edges)
-//     u v w                        (one edge per line, u < v, integer w >= 1)
+//     u v w                        (one edge per line, u < v, integer w != 0;
+//                                   w may be negative)
 //     ...
 //
 //   <output.cut>

@@ -1,8 +1,8 @@
 {
   "name": "dlat400",
   "family": "dlat",
-  "category": "STRUCTURED",
-  "time_limit_s": 60,
+  "category": "POSITIVE",
+  "time_limit_s": 30,
   "seed": 101,
   "params": {
     "L": 400,
@@ -26,11 +26,11 @@
   "sdp_primal": 10991282.583,
   "foundation_cut": 9926591,
   "foundation_ratio": 1.10767,
-  "ref_cut": 10722352,
-  "ref_ratio": 1.02546,
-  "ref60_ratio": 1.02727,
+  "ref_cut": 10752662,
+  "ref_ratio": 1.02257,
+  "ref60_ratio": 1.02376,
   "ref_seconds": 300,
-  "ref60_cut": 10703468,
+  "ref60_cut": 10740173,
   "bound_rank": 20,
   "bound_sweeps": 1500
 }

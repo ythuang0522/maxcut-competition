@@ -3,10 +3,13 @@ CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra
 
 # macOS workaround: some Command Line Tools installs are missing headers in
 # /Library/Developer/CommandLineTools/usr/include/c++/v1. Fall back to the
-# SDK's c++/v1 when the default location is broken. No-op on Linux.
+# SDK's c++/v1 only when the compiler cannot find <cstdint> on its own (a
+# Homebrew LLVM compiler has its own headers and breaks if given the SDK's).
+# No-op on Linux.
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-    ifeq ($(wildcard /Library/Developer/CommandLineTools/usr/include/c++/v1/cstdint),)
+    CXX_HEADERS_OK := $(shell printf 'int main(){return 0;}' | $(CXX) -x c++ -std=c++17 -include cstdint -fsyntax-only - >/dev/null 2>&1 && echo yes)
+    ifneq ($(CXX_HEADERS_OK),yes)
         SDK_CXX_INC := $(shell xcrun --sdk macosx --show-sdk-path 2>/dev/null)/usr/include/c++/v1
         ifneq ($(wildcard $(SDK_CXX_INC)/cstdint),)
             CXXFLAGS += -isystem $(SDK_CXX_INC)
@@ -28,7 +31,7 @@ solver: solver.cpp
 
 # --- instances ---------------------------------------------------------------
 
-# The six scored graphs (30 MB) are fetched from the GitHub Release and
+# The six scored graphs (25 MB) are fetched from the GitHub Release and
 # checked against checksums/scored.sha256. The dev graphs are in the repo.
 instances:
 	scripts/download.sh
@@ -52,7 +55,7 @@ tools/ref/solvers/refsolve: tools/ref/solvers/refsolve.cpp
 test: foundation
 	python3 tools/test_grade.py
 
-# Three quick dataset checks: the two v1.1 graphs regenerate exactly,
+# Three quick dataset checks: the six v1.2 graphs regenerate exactly,
 # scripts/download.sh recovers and aborts correctly (offline), and the six
 # scored graphs agree across instances.txt, metas, checksums and download.sh.
 dataset-check: tools/gen/gen

@@ -8,12 +8,15 @@ Per instance:
   2. Check the output is a valid cut: exactly n values, each 0 or 1, the side
      of every vertex.
   3. Add up the weights of the edges whose endpoints are on different sides
-     and divide the instance's PROVEN upper bound by that:
+     (weights may be negative) and divide the instance's PROVEN upper bound
+     by that:
 
-         ratio = upper_bound / cut_weight        (>= 1.0; lower is better)
+         ratio = min(upper_bound / cut_weight, 2.0)   (>= 1.0; lower is better)
 
-     A failed instance (timeout, crash, invalid cut, memory, threads)
-     scores FAIL_RATIO = 2.0 and still counts towards the mean.
+     A failed instance (timeout, crash, invalid cut, memory, threads), or a
+     cut of weight <= 0, scores FAIL_RATIO = 2.0 and still counts towards
+     the mean. On a signed graph a random cut weighs about 0, so the cap
+     keeps one bad instance from swamping the other five.
 
 Aggregate: geometric mean of the ratios per category and overall.
 **Lower is better.** 1.000 would mean provably optimal on every instance.
@@ -25,8 +28,7 @@ Usage:
 where instances.txt has one line per instance:
    <category> <instance.mc> <time_limit_seconds>
 
-Categories: RANDOM (random regular, Erdos-Renyi, power-law) or STRUCTURED
-(triangular lattice, geometric, planted communities). The `<instance>.meta.json`
+Categories: POSITIVE (every weight >= 1) or SIGNED (weights of both signs). The `<instance>.meta.json`
 beside each `.mc` carries the upper bound; without it the instance cannot be
 scored.
 
@@ -36,11 +38,12 @@ Nobody knows the maximum cut of a graph with two million edges. What we do
 have is a PROVEN upper bound on it: the semidefinite-programming relaxation
 (Goemans-Williamson), certified through its dual as (n/4) * lambda_max of a
 corrected Laplacian (tools/bound). On these graphs it sits a few percent above
-the best cut anyone has found, so a ratio of 1.05 means "at most 5% below
-optimal, probably less". The bound is the same number for everybody on a given
+the best cut anyone has found (a few percent on the positive graphs, more on
+the signed ones), so a ratio of 1.05 means "at most 5% below optimal,
+probably less". The bound is the same number for everybody on a given
 instance, so it scales every student's ratio identically and cancels out of
 the ranking. What does NOT cancel is your machine's speed: a faster laptop
-gets more search done in the same 60 seconds. The instructor re-runs the top
+gets more search done in the same 30 seconds. The instructor re-runs the top
 submissions on one machine.
 """
 
@@ -61,9 +64,9 @@ from array import array
 from collections import defaultdict
 from pathlib import Path
 
-RANDOM_CATEGORIES = {"RANDOM"}
-STRUCTURED_CATEGORIES = {"STRUCTURED"}
-ALL_CATEGORIES = RANDOM_CATEGORIES | STRUCTURED_CATEGORIES
+POSITIVE_CATEGORIES = {"POSITIVE"}
+SIGNED_CATEGORIES = {"SIGNED"}
+ALL_CATEGORIES = POSITIVE_CATEGORIES | SIGNED_CATEGORIES
 
 FAIL_RATIO = 2.0                      # a failed instance scores this
 MEM_CAP_BYTES = 4 << 30               # the 4 GB rule
@@ -228,6 +231,8 @@ def read_instance(path):
             u, v, w = int(toks[0]), int(toks[1]), int(toks[2])
             if not (0 <= u < n and 0 <= v < n) or u == v:
                 raise ValueError(f"{path}: edge ({u}, {v}) is not a valid edge")
+            if w == 0:
+                raise ValueError(f"{path}: edge ({u}, {v}) has weight 0")
             us.append(u)
             vs.append(v)
             ws.append(w)
@@ -354,7 +359,7 @@ def main():
                     note = "INVALID"
                     rec["invalid_reason"] = why
                 else:
-                    ratio = ub / cut if cut > 0 else FAIL_RATIO
+                    ratio = min(ub / cut, FAIL_RATIO) if cut > 0 else FAIL_RATIO
                     note = "ok"
                     rec["cut_sha256"] = sha256_file(out)
                     if args.keep_cuts:
@@ -375,12 +380,12 @@ def main():
         print(f"{cat:<11}{name:<10}{n:>8}{m:>9}{limit:6.0f}{wall:7.1f}"
               f"{cs}{ub:11d}{ratio:8.4f}{gap}  {note}")
 
-    rnd = sum((ratios_by_cat[c] for c in RANDOM_CATEGORIES), [])
-    stc = sum((ratios_by_cat[c] for c in STRUCTURED_CATEGORIES), [])
-    overall = rnd + stc
+    pos = sum((ratios_by_cat[c] for c in POSITIVE_CATEGORIES), [])
+    sgn = sum((ratios_by_cat[c] for c in SIGNED_CATEGORIES), [])
+    overall = pos + sgn
     print()
-    print(f"Random     geomean ratio = {geomean(rnd):.4f}  (n={len(rnd)})")
-    print(f"Structured geomean ratio = {geomean(stc):.4f}  (n={len(stc)})")
+    print(f"Positive   geomean ratio = {geomean(pos):.4f}  (n={len(pos)})")
+    print(f"Signed     geomean ratio = {geomean(sgn):.4f}  (n={len(sgn)})")
     print(f"Overall    geomean ratio = {geomean(overall):.4f}  (n={len(overall)})   "
           f"<- your score; lower is better, 1.0000 would be optimal")
 
@@ -398,8 +403,8 @@ def main():
             "cpu_wall_ratio": CPU_WALL_RATIO,
             "fail_ratio": FAIL_RATIO,
             "instances": records,
-            "random_geomean": geomean(rnd),
-            "structured_geomean": geomean(stc),
+            "positive_geomean": geomean(pos),
+            "signed_geomean": geomean(sgn),
             "overall_geomean": geomean(overall),
         }
         args.json.write_text(json.dumps(payload, indent=2) + "\n")

@@ -2,7 +2,9 @@
 """Instructor pipeline: build instances with proven bounds and reference cuts.
 
     python3 tools/pipeline.py build --manifest tools/manifest/public.json \
-            --out instances --ref-seconds 300 [--only reg400k] [--jobs 3]
+            --out instances --ref-seconds 300 [--only tri300s] [--jobs 3]
+    python3 tools/pipeline.py build --manifest tools/manifest/hidden.json \
+            --out instances_hidden --cuts instances_hidden/ref/cuts --no-checksums
     python3 tools/pipeline.py check [--dir instances] [--fast]
 
 `build`, per instance:
@@ -55,7 +57,7 @@ def run(cmd, **kw):
     return r
 
 
-def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False):
+def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False, cuts=CUTS):
     name = spec["name"]
     mc = out_dir / f"{name}.mc"
     meta_path = out_dir / f"{name}.meta.json"
@@ -71,10 +73,10 @@ def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False):
     if reusable:
         meta.update({k: v for k, v in old_meta.items() if k not in meta})
     n, m, us, vs, ws = read_instance(mc)
-    CUTS.mkdir(parents=True, exist_ok=True)
+    cuts.mkdir(parents=True, exist_ok=True)
 
     # 2. foundation
-    f_cut_path = CUTS / f"{name}.foundation.cut"
+    f_cut_path = cuts / f"{name}.foundation.cut"
     run([FOUNDATION, mc, f_cut_path, spec["time_limit_s"]])
     f_cut, why = verify_cut(f_cut_path, n, us, vs, ws)
     if f_cut is None:
@@ -82,7 +84,7 @@ def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False):
     log(f"foundation {f_cut}")
 
     # 3. reference (long run) and the same solver on the students' budget
-    ref_path = CUTS / f"{name}.cut"
+    ref_path = cuts / f"{name}.cut"
     secs = ref_seconds if not name.startswith("dev_") else max(10, ref_seconds // 10)
     extra = {}
     if reusable and ref_path.exists() and "ref_cut" in meta:
@@ -92,16 +94,19 @@ def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False):
     else:
         log(f"refsolve {secs}s ...")
         r = run([REFSOLVE, mc, ref_path, secs, 1])
-        rep = json.loads(r.stdout.strip().splitlines()[-1])
         ref_cut, why = verify_cut(ref_path, n, us, vs, ws)
-        if ref_cut != rep["cut"]:
+        try:                                   # the SA reference prints {"cut": ...}; v1.2's prints nothing
+            rep = json.loads(r.stdout.strip().splitlines()[-1])
+        except (IndexError, ValueError):
+            rep = {}
+        if "cut" in rep and ref_cut != rep["cut"]:
             raise SystemExit(f"{name}: refsolve says {rep['cut']}, checker says {ref_cut} ({why})")
         extra = {"ref_seconds": secs}
     if ref_cut is None:
         raise SystemExit(f"{name}: reference cut invalid: {why}")
     log(f"ref {ref_cut}")
 
-    ref60_path = CUTS / f"{name}.ref60.cut"
+    ref60_path = cuts / f"{name}.ref60.cut"
     if reusable and ref60_path.exists() and "ref60_cut" in meta:
         ref60_cut, why = verify_cut(ref60_path, n, us, vs, ws)
     else:
@@ -109,7 +114,7 @@ def build_one(spec, manifest, out_dir, ref_seconds, reuse_ref=False):
         run([REFSOLVE, mc, ref60_path, spec["time_limit_s"], 1])
         ref60_cut, why = verify_cut(ref60_path, n, us, vs, ws)
     if ref60_cut is None:
-        raise SystemExit(f"{name}: 60 s reference cut invalid: {why}")
+        raise SystemExit(f"{name}: student-budget reference cut invalid: {why}")
     extra["ref60_cut"] = ref60_cut
     log(f"ref@{spec['time_limit_s']}s {ref60_cut}")
 
@@ -168,10 +173,11 @@ def cmd_build(args):
         if not exe.exists():
             raise SystemExit(f"missing {exe}: run  make foundation tools tools/ref/solvers/refsolve")
     with ThreadPoolExecutor(max_workers=args.jobs) as ex:
-        futs = [ex.submit(build_one, s, args.manifest, args.out, args.ref_seconds, args.reuse_ref)
+        futs = [ex.submit(build_one, s, args.manifest, args.out, args.ref_seconds, args.reuse_ref, args.cuts)
                 for s in specs]
         results = [f.result() for f in futs]
-    write_checksums(args.out)
+    if not args.no_checksums:
+        write_checksums(args.out)
     print()
     print(f"{'instance':<12}{'n':>8}{'m':>9}{'bound':>11}{'foundation':>11}{'UB/fnd':>8}"
           f"{'ref60':>11}{'UB/r60':>8}{'ref300':>11}{'UB/ref':>8}")
@@ -223,6 +229,10 @@ def main():
     b.add_argument("--reuse-ref", action="store_true",
                    help="keep existing reference cuts and bounds when the instance is unchanged")
     b.add_argument("--jobs", type=int, default=3)
+    b.add_argument("--cuts", type=Path, default=CUTS,
+                   help="where the foundation/reference cuts go (the hidden set needs its own)")
+    b.add_argument("--no-checksums", action="store_true",
+                   help="do not rewrite checksums/ (use for the hidden set)")
     c = sub.add_parser("check")
     c.add_argument("--dir", type=Path, default=ROOT / "instances")
     c.add_argument("--fast", action="store_true", help="skip recomputing the bounds")

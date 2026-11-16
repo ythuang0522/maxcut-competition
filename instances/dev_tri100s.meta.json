@@ -1,0 +1,32 @@
+{
+  "name": "dev_tri100s",
+  "family": "tritail",
+  "category": "SIGNED",
+  "time_limit_s": 10,
+  "seed": 20261116,
+  "params": {
+    "L": 100,
+    "tail": 3,
+    "neg": 500
+  },
+  "description": "dev tier",
+  "n": 10000,
+  "m": 30000,
+  "total_weight": 60,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "ab9529e0df7851c76938867c631daf87d4027ebaaf10ac5f8a2bd9d71224e156",
+  "upper_bound": 316715,
+  "lambda_max": 126.673556842,
+  "sdp_primal": 316631.215,
+  "foundation_cut": 253263,
+  "foundation_ratio": 1.25054,
+  "ref_cut": 304765,
+  "ref_ratio": 1.03921,
+  "ref60_ratio": 1.03988,
+  "ref_seconds": 30,
+  "ref60_cut": 304568,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

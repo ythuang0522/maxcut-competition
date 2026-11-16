@@ -43,6 +43,7 @@ static int N = 0;
 static long long M = 0;
 static vector<int> START, ADJ;
 static vector<double> W, DEG;                      // per adjacency entry / weighted degree
+static long long WPOS = 0;                         // sum of the positive weights: no cut is heavier
 
 static void read_instance(const char* path) {
     std::FILE* f = std::fopen(path, "r");
@@ -53,6 +54,7 @@ static void read_instance(const char* path) {
     for (long long e = 0; e < M; ++e) {
         if (std::fscanf(f, "%d %d %lld", &eu[e], &ev[e], &ew[e]) != 3) { std::fprintf(stderr, "bad edge %lld\n", e); std::exit(1); }
         ++cnt[eu[e] + 1]; ++cnt[ev[e] + 1];
+        if (ew[e] > 0) WPOS += ew[e];
     }
     std::fclose(f);
     for (int i = 0; i < N; ++i) cnt[i + 1] += cnt[i];
@@ -291,7 +293,7 @@ int main(int argc, char** argv) {
     double bound_real = (double)N * lam / 4.0;
     double margin = 1e-4;
     long long ub = (long long)std::floor(bound_real * (1.0 + margin));
-    if (ub > Wtot) ub = Wtot;                      // never above the total weight
+    if (ub > WPOS) ub = WPOS;                      // never above the positive weight (= W if no negatives)
     if (json) {
         std::printf("{\"upper_bound\": %lld, \"lambda_max\": %.9f, \"bound_real\": %.3f, \"sdp_primal\": %.3f, "
                     "\"total_weight\": %lld, \"lanczos_steps\": %d, \"rank\": %d, \"sweeps\": %d, \"iters\": %d, \"margin\": %g}\n",

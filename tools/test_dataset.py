@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Three checks of the shipped dataset (v1.1).
+"""Three checks of the shipped dataset (v1.2).
 
     make dataset-check            # or: make tools && python3 tools/test_dataset.py
 
-  1. the generator rebuilds the two graphs adopted in v1.1, tri400tail and
-     dlat400, byte for byte from tools/manifest/public.json
+  1. the generator rebuilds all six scored graphs byte for byte from
+     tools/manifest/public.json (the four signed ones are the exact files
+     the 2026-11-16 solver panel was run on)
   2. scripts/download.sh keeps verified files, fetches a corrupt and a missing
      one again, and aborts on a bad download without leaving a file behind
      (offline: curl is replaced by a stub)
@@ -28,12 +29,16 @@ sys.path.insert(0, str(ROOT))
 from grade import FAIL_RATIO  # noqa: E402
 
 GEN = ROOT / "tools" / "gen" / "gen"
-SCORED = ["reg200k", "regw200k", "gnm200k", "tri400tail", "dlat400", "geo20k"]
-RETIRED = ["tri400", "tri900"]
-# The two graphs adopted in v1.1, as measured when they were selected.
+SCORED = ["tri400tail", "dlat400", "tri300s", "tri200s4", "tri200g", "vbg80k"]
+RETIRED = ["reg200k", "regw200k", "gnm200k", "tri400", "tri900", "geo20k"]
+# The six v1.2 graphs, as measured when they were selected.
 ADOPTED_SHA256 = {
     "tri400tail": "3e8825087117caea09ad4a29bd4d90fd288e33ac62cdd8e0174013a722a349e4",
     "dlat400": "2caa57c71a2983afeb76a8f82bbc6485824fa9ddc88432c661136326a944082d",
+    "tri300s": "b5e5dbe205147dd59b2ca2546a9ee0811894b01480682d826cd6fcaad0bd2f52",
+    "tri200s4": "ba4147eb993e12207098d978c66bc5b4e3dd0e338db77e45206e3f62ea5262c6",
+    "tri200g": "f041523319306329d5652b0b9537729434f9ea862ed8475d54c87774073d6ae6",
+    "vbg80k": "a3b6db738988aea3cd55ead53fda44c84bfc0e1d6e58da10a4be8f96a998ffcf",
 }
 
 
@@ -46,7 +51,7 @@ def read_sums(path):
 
 
 def test_adopted_pair_regenerates():
-    """1. tri400tail and dlat400 regenerate byte for byte."""
+    """1. the six scored graphs regenerate byte for byte."""
     if not GEN.exists():
         raise SystemExit(f"{GEN} is not built; run:  make tools")
     scored = read_sums(ROOT / "checksums" / "scored.sha256")
@@ -104,14 +109,14 @@ def test_download_recovers_and_aborts():
 
         # an outdated file and a missing file: only these two are fetched
         (inst / "dlat400.mc").write_text("2 1\n0 1 999\n")
-        (inst / "geo20k.mc").unlink()
+        (inst / "tri200g.mc").unlink()
         r, urls = run()
         if r.returncode != 0:
             bad.append(f"recovery exit {r.returncode}: {r.stderr.strip()[-200:]}")
-        if sorted(Path(u).name for u in urls) != ["dlat400.mc.gz", "geo20k.mc.gz"]:
+        if sorted(Path(u).name for u in urls) != ["dlat400.mc.gz", "tri200g.mc.gz"]:
             bad.append(f"recovery fetched {urls}")
-        if not all("/releases/download/v1.1/" in u for u in urls):
-            bad.append("recovery did not use release v1.1")
+        if not all("/releases/download/v1.2/" in u for u in urls):
+            bad.append("recovery did not use release v1.2")
         if any(sha256(inst / f"{n}.mc") != hashlib.sha256(b).hexdigest() for n, b in bodies.items()):
             bad.append("installed files do not match checksums")
 
@@ -148,10 +153,10 @@ def test_scored_set_is_coherent():
     for where, names in views.items():
         if sorted(names) != sorted(SCORED):
             bad.append(f"{where}: {names}")
-    if [r[0] for r in rows] != ["RANDOM"] * 3 + ["STRUCTURED"] * 3 or {r[2] for r in rows} != {"60"}:
-        bad.append("instances.txt: not 3 RANDOM + 3 STRUCTURED at 60 s")
-    if "RELEASE_TAG:-v1.1}" not in dl:
-        bad.append("download.sh does not default to v1.1")
+    if [r[0] for r in rows] != ["POSITIVE"] * 2 + ["SIGNED"] * 4 or {r[2] for r in rows} != {"30"}:
+        bad.append("instances.txt: not 2 POSITIVE + 4 SIGNED at 30 s")
+    if "RELEASE_TAG:-v1.2}" not in dl:
+        bad.append("download.sh does not default to v1.2")
     for name in SCORED:
         p = ROOT / "instances" / f"{name}.meta.json"
         if not p.exists():

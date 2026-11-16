@@ -5,12 +5,18 @@ You are given a working approximation algorithm for Max-Cut,
 (put every vertex on a random side; each edge is cut with probability 1/2)
 followed by the obvious local improvement (move any vertex that has more
 weight on its own side than across). Copy it to `solver.cpp` and make its
-cuts **heavier**. Same input, a valid cut out, 60 seconds, one thread.
+cuts **heavier**. Same input, a valid cut out, 30 seconds, one thread.
 
-This is not a speed contest. Every solver gets the same 60 s per instance.
+**Weights can be negative.** Four of the six scored graphs are *signed*: a
+negative edge rewards keeping its two endpoints on the **same** side. The
+lecture's 1/2 guarantee does not survive this — half the total weight can be
+about zero — so on those graphs a random cut is worth nothing and everything
+comes from the search.
+
+This is not a speed contest. Every solver gets the same 30 s per instance.
 What is measured is **how close your cut is to the optimum**: a proven upper
 bound on the maximum cut divided by the weight of your cut. 1.000 would be
-optimal. The foundation scores about 1.11.
+optimal. The foundation scores about 1.20.
 
 **Your entire job is one C++ file.** Everything else — running, timing,
 checking, scoring — is done by one Python script, `grade.py`. You hand in
@@ -29,14 +35,14 @@ the `Overall geomean ratio` line is your score. **Lower is better.**
 
 ```sh
 make foundation                          # 1. build the baseline
-scripts/download.sh                      # 2. fetch the six scored graphs (11 MB, once)
+scripts/download.sh                      # 2. fetch the six scored graphs (9 MB, once)
 cp maxcut_foundation.cpp solver.cpp      # 3. this file is your assignment
 make solver                              #    ...edit solver.cpp, rebuild...
 python3 grade.py --solver ./solver --instances instances_dev.txt              # 4. quick check (1 min)
-python3 grade.py --solver ./solver --instances instances.txt --json result.json   # 5. score (6 min)
+python3 grade.py --solver ./solver --instances instances.txt --json result.json   # 5. score (3 min)
 ```
 
-Step 2 downloads the six scored graphs (30 MB uncompressed, too large for
+Step 2 downloads the six scored graphs (25 MB uncompressed, too large for
 git) and checks every file's SHA-256 against `checksums/`; the practice graphs
 are already in the repo. Run it again after every `git pull`: it keeps the
 files that still match and fetches any that are missing or outdated. Step 5
@@ -46,37 +52,37 @@ prints a table and writes `result.json`. Before you change anything,
 ```
 category   instance         n        m limit   wall        cut      bound   ratio     gap  note
 ----------------------------------------------------------------------------------------------------------
-RANDOM     reg200k     200000   300000    60    0.1     254406     291519  1.1459  14.59%  ok
-RANDOM     regw200k    200000   300000    60    0.1   13146679   14917537  1.1347  13.47%  ok
-RANDOM     gnm200k     200000   300000    60    0.1   12872948   14654742  1.1384  13.84%  ok
-STRUCTURED tri400tail  160000   480000    60    0.1    9888193   10819248  1.0942   9.42%  ok
-STRUCTURED dlat400     160000   480000    60    0.1    9926591   10995384  1.1077  10.77%  ok
-STRUCTURED geo20k       20000   118572    60    0.0    3554765    3761949  1.0583   5.83%  ok
+POSITIVE   tri400tail  160000   480000    30    0.6    9888193   10819248  1.0942   9.42%  ok
+POSITIVE   dlat400     160000   480000    30    0.1    9926591   10995384  1.1077  10.77%  ok
+SIGNED     tri300s      90000   270000    30    0.0    2266456    2823442  1.2458  24.58%  ok
+SIGNED     tri200s4     40000   120000    30    0.0     857703    1049436  1.2235  22.35%  ok
+SIGNED     tri200g      40000   120000    30    0.0     816389    1039228  1.2730  27.30%  ok
+SIGNED     vbg80k       80000   120000    30    0.0    1079270    1400885  1.2980  29.80%  ok
 
-Random     geomean ratio = 1.1397  (n=3)
-Structured geomean ratio = 1.0865  (n=3)
-Overall    geomean ratio = 1.1128  (n=6)   <- your score; lower is better, 1.0000 would be optimal
+Positive   geomean ratio = 1.1009  (n=2)
+Signed     geomean ratio = 1.2597  (n=4)
+Overall    geomean ratio = 1.2044  (n=6)   <- your score; lower is better, 1.0000 would be optimal
 ```
 
-As you improve `solver.cpp` the `ratio` column falls towards 1. In 60 s the
-instructor's reference solver reaches 1.0185–1.0560 per graph (see
+As you improve `solver.cpp` the `ratio` column falls towards 1. In 30 s the
+instructor's reference solver reaches 1.0182–1.0667 per graph (see
 [The data](#the-data)).
 
 `note=ok` means a valid cut was written in time. Anything else (`TIMEOUT`,
 `INVALID`, `CRASH` and the others in
 [What the notes mean](#what-the-notes-mean)) means that instance scores
-**2.0**, whatever cut the solver had found. One 2.0 among six ratios puts the
-score at 1.1225 or above even if the other five cuts are optimal, which is
-worse than the unmodified foundation (1.1128). A valid cut first, then a heavy
-one. Manage your clock: the limit is `argv[3]`, and the grader kills you at
-61 s whatever you were about to write.
+**2.0**, whatever cut the solver had found. One 2.0 among six ratios costs
+as much as making the other five cuts about 12% lighter: a solver at the
+reference's level (about 1.04) drops to about 1.16 overall. A valid cut first,
+then a heavy one. Manage your clock: the limit is `argv[3]`, and the grader
+kills you at 31 s whatever you were about to write.
 
 That is the whole workflow. Repeat step 5 as you improve `solver.cpp`, and
 upload the two files whenever you want to see where you stand.
 
 ### Iterating quickly
 
-The scored run takes six minutes if your solver uses its whole budget. While
+The scored run takes three minutes if your solver uses its whole budget. While
 you work, use the dev set, which has the same kinds of graph at 3,600–10,000
 vertices and gives each 10 s:
 
@@ -95,7 +101,7 @@ Your `solver.cpp` must:
    keep the command line: `./solver <instance.mc> <output.cut> <time_limit_s>`.
 2. Write a **valid cut**: exactly `n` values, each `0` or `1`, the side of
    every vertex in order, whitespace-separated (one per line is fine).
-3. Finish within the time limit given as `argv[3]` (60 s on the scored set).
+3. Finish within the time limit given as `argv[3]` (30 s on the scored set).
    The grader kills the process one second after the limit; a run that is
    killed scores 2.0 even if a good cut was about to be written.
 4. Be C++17 using only the standard library.
@@ -141,7 +147,7 @@ only; it is never shown to other students.
   *Tries* column counts attempts).
 - The board closes at the deadline shown in the header (**6 Dec 2026,
   23:59 Taipei**). Late uploads are refused.
-- **Overall / Random / Structured** switch the ranking key; Overall is the
+- **Overall / Positive / Signed** switch the ranking key; Overall is the
   official one.
 - Uploads that were not produced by `grade.py --json`, that come from the dev
   set, that used a different time limit, or that claim a cut heavier than the
@@ -152,7 +158,7 @@ only; it is never shown to other students.
 For each instance:
 
 ```
-ratio = upper_bound / cut_weight
+ratio = min(upper_bound / cut_weight, 2.0)
 ```
 
 where `upper_bound` is a **proven** upper bound on the maximum cut of that
@@ -162,21 +168,24 @@ graph (see below). Your score is the geometric mean of the six ratios.
 - **A failed instance scores 2.0 and still counts.** An invalid cut, a
   timeout, too much memory, or extra threads on one instance drags your mean
   up; they are never dropped. Running the unmodified foundation on an
-  instance (1.06–1.15) is always better than failing it. So is a random cut
-  (about 1.6): every weight is positive, so half the total weight is always
-  within reach.
-- Three instances are **RANDOM** (sparse random graphs: 3-regular unweighted,
-  3-regular weighted, Erdős–Rényi), three are **STRUCTURED** (a frustrated
-  triangular lattice with heavy-tailed weights, an irregular frustrated
-  lattice, a geometric graph). `grade.py` reports the two sub-means, but the
-  overall geometric mean is your score.
+  instance (1.09–1.30) is always better than failing it.
+- **2.0 is also the cap.** On a signed graph a cut can weigh almost nothing
+  or even less than nothing (a random cut weighs about 0). A cut of weight
+  0 or below scores 2.0, and so does any cut lighter than half the bound, so
+  one bad instance never costs more than a failure.
+- Two instances are **POSITIVE** (every weight at least 1: a frustrated
+  triangular lattice with heavy-tailed weights and an irregular frustrated
+  lattice) and four are **SIGNED** (weights of both signs: three triangular
+  lattices with different weight distributions and a random 3-regular graph).
+  `grade.py` reports the two sub-means, but the overall geometric mean is
+  your score.
 - **The bound is not the optimum.** It is the value of the semidefinite
-  relaxation, which on these graphs is a few percent above the true maximum
-  cut. A ratio of 1.05 means "at most 5% below optimal, probably less". Nobody
-  will reach 1.000; the interesting range is roughly 1.02–1.20, so the board
-  shows four decimals.
+  relaxation, which sits about 2% above the best known cut on the positive
+  graphs and 3–7% on the signed ones. A ratio of 1.05 means "at most 5% below
+  optimal, probably less". Nobody will reach 1.000; the interesting range is
+  roughly 1.02–1.30, so the board shows four decimals.
 - **Machine speed matters a little.** A faster laptop gets more search done
-  in the same 60 s. The effect is small next to the algorithmic differences,
+  in the same 30 s. The effect is small next to the algorithmic differences,
   and the instructor re-runs the top submissions on one machine before final
   grades.
 
@@ -184,7 +193,7 @@ graph (see below). Your score is the geometric mean of the six ratios.
 
 | note | meaning | ratio for that instance |
 |---|---|---|
-| `ok` | valid cut, within limits | `upper_bound / cut_weight` |
+| `ok` | valid cut, within limits | `min(upper_bound / cut_weight, 2.0)`; 2.0 if the cut weighs 0 or less |
 | `INVALID` | not exactly `n` values, a value other than 0/1, or junk (`invalid_reason` in result.json says which) | 2.0 |
 | `TIMEOUT` | still running one second after the limit | 2.0 |
 | `MEMORY` | exceeded 4 GB | 2.0 |
@@ -193,30 +202,29 @@ graph (see below). Your score is the geometric mean of the six ratios.
 
 ## The data
 
-Six graphs are scored: three sparse random graphs (average degree 3) and three
-geometric or lattice graphs. A trick that helps on one kind may not help on
-the other:
+Six graphs are scored: two lattices with positive weights and four signed
+graphs. All of them are frustrated (no cut can satisfy every edge), and the
+weights are spread out — heavy-tailed or bell-shaped — so a few edges matter a
+lot more than the rest. A trick that helps on one may not help on another:
 
-| instance | vertices | edges | family | what it is | bound | foundation | reference 60 s | reference 5 min |
+| instance | vertices | edges | category | what it is | bound | foundation | reference 30 s | reference 5 min |
 |---|---:|---:|---|---|---:|---:|---:|---:|
-| `reg200k` | 200,000 | 300,000 | RANDOM | random 3-regular graph, unit weights; every vertex has exactly three neighbours | 291,519 | 1.1459 | 1.0560 | 1.0538 |
-| `regw200k` | 200,000 | 300,000 | RANDOM | random 3-regular graph, weights 1–100 | 14,917,537 | 1.1347 | 1.0339 | 1.0306 |
-| `gnm200k` | 200,000 | 300,000 | RANDOM | sparse Erdős–Rényi, average degree 3, weights 1–100; degrees vary and some vertices are isolated | 14,654,742 | 1.1384 | 1.0400 | 1.0373 |
-| `tri400tail` | 160,000 | 480,000 | STRUCTURED | triangular lattice on a 400 × 400 torus, heavy-tailed weights 1–100 (most edges light, a few heavy); every triangle must leave one edge uncut | 10,819,248 | 1.0942 | 1.0227 | 1.0210 |
-| `dlat400` | 160,000 | 480,000 | STRUCTURED | irregular frustrated lattice: the 400 × 400 triangular torus with 10% of its edges deleted and extra mid-range and long-range edges added; degrees 0–12, heavy-tailed weights 1–100 | 10,995,384 | 1.1077 | 1.0273 | 1.0255 |
-| `geo20k` | 20,000 | 118,572 | STRUCTURED | random points in a square, pairs within a radius joined, closer pairs heavier; dense local clusters | 3,761,949 | 1.0583 | 1.0185 | 1.0179 |
+| `tri400tail` | 160,000 | 480,000 | POSITIVE | triangular lattice on a 400 × 400 torus, heavy-tailed weights 1–100 (most edges light, a few heavy); every triangle must leave one edge uncut | 10,819,248 | 1.0942 | 1.0182 | 1.0176 |
+| `dlat400` | 160,000 | 480,000 | POSITIVE | irregular frustrated lattice: the 400 × 400 triangular torus with 10% of its edges deleted and extra mid-range and long-range edges added; degrees 0–12, heavy-tailed weights 1–100 | 10,995,384 | 1.1077 | 1.0238 | 1.0226 |
+| `tri300s` | 90,000 | 270,000 | SIGNED | triangular lattice on a 300 × 300 torus, heavy-tailed magnitudes 1–100, each edge negative with probability 1/2 | 2,823,442 | 1.2458 | 1.0409 | 1.0394 |
+| `tri200s4` | 40,000 | 120,000 | SIGNED | triangular lattice on a 200 × 200 torus, magnitudes 1 + ⌊100u⁴⌋ (even heavier-tailed: most edges very light), random signs | 1,049,436 | 1.2235 | 1.0300 | 1.0287 |
+| `tri200g` | 40,000 | 120,000 | SIGNED | triangular lattice on a 200 × 200 torus, bell-shaped weights: the sum of four uniform draws in [−25, 25], never 0 | 1,039,228 | 1.2730 | 1.0667 | 1.0658 |
+| `vbg80k` | 80,000 | 120,000 | SIGNED | random 3-regular graph, the same bell-shaped signed weights as `tri200g` | 1,400,885 | 1.2980 | 1.0492 | 1.0476 |
 
 *foundation* is the unmodified starting code; *reference* is the instructor's
-own solver (a simulated annealing over single-vertex moves, then local
-improvement) given 60 s and five minutes. Beating the five-minute reference
-is entirely possible with a good tabu or breakout local search and earns a
-badge on the board.
+own solver given 30 s and five minutes. Beating the five-minute reference is
+possible and earns a badge on the board.
 
 Each instance is two files in `instances/`: `<name>.mc` (the graph) and
 `<name>.meta.json` (the bound, the reference cuts, the file's SHA-256, and how
-the graph was made). All weights are positive integers. The six scored `.mc`
-files total 30 MB and are fetched by `scripts/download.sh` from the GitHub
-Release; the meta files and the `dev_*` graphs are in the repo.
+the graph was made). Weights are nonzero integers. The six scored `.mc` files
+total 25 MB and are fetched by `scripts/download.sh` from the GitHub Release;
+the meta files and the `dev_*` graphs are in the repo.
 
 **The final grading uses fresh graphs** generated by the same code with the
 same parameters and a different seed, with bounds computed the same way.
@@ -232,11 +240,13 @@ u v w                              s_1
 u v w                              ...
 ...                                s_{n-1}
 (one edge per line, 0 <= u < v < n,   (n values, each 0 or 1: the side of
- integer weight w >= 1)                 vertex i; whitespace-separated)
+ integer weight w != 0, may be          vertex i; whitespace-separated)
+ negative)
 ```
 
 The cut's value is the total weight of the edges whose endpoints are on
-different sides. `grade.py` computes it exactly in 64-bit integers.
+different sides, negative weights included. `grade.py` computes it exactly in
+64-bit integers.
 
 ## Where the bound comes from
 
@@ -256,9 +266,12 @@ because every `x_i² = 1`. `tools/bound/bound.cpp` solves the semidefinite
 relaxation approximately (a low-rank "mixing method"), reads off the best
 `u` from its optimality conditions, and computes `λ_max` by Lanczos with a
 safety margin. The result is a valid bound whatever the optimiser did — the
-optimisation only makes it tight. You do not need it to compete, but the same
-vectors, rounded by a random hyperplane, are the 0.878-approximation, and a
-good starting point for a local search.
+optimisation only makes it tight. Nothing here needs the weights to be
+positive, so the same bound covers the signed graphs (it is also never above
+the sum of the positive weights, which no cut can exceed). You do not need it
+to compete, but the same vectors, rounded by a random hyperplane, are the
+0.878-approximation on the positive graphs (the guarantee needs nonnegative
+weights) and a good starting point for a local search on all of them.
 
 ## Everything else (optional reading)
 
@@ -277,11 +290,11 @@ bound them:
 
 ```sh
 make tools                                          # builds tools/gen/gen and tools/bound/bound
-python3 -m tools.gen --instance reg200k --seed 12345 --out mydata
-tools/bound/bound mydata/reg200k.mc --json          # prints {"upper_bound": ...}
+python3 -m tools.gen --instance tri300s --seed 12345 --out mydata
+tools/bound/bound mydata/tri300s.mc --json          # prints {"upper_bound": ...}
 ```
 
-Put the `upper_bound` into `mydata/reg200k.meta.json`, list the instance in
+Put the `upper_bound` into `mydata/tri300s.meta.json`, list the instance in
 your own instances file in the same `<category> <file.mc> <seconds>` format,
 and point `--instances` at it.
 

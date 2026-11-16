@@ -1,0 +1,32 @@
+{
+  "name": "tri300s",
+  "family": "tritail",
+  "category": "SIGNED",
+  "time_limit_s": 30,
+  "seed": 20261116,
+  "params": {
+    "L": 300,
+    "tail": 3,
+    "neg": 500
+  },
+  "description": "Signed triangular lattice on a 300 x 300 torus (90,000 vertices, degree 6): heavy-tailed magnitudes 1-100 as in tri400tail, and each edge negative with probability 1/2. A negative edge rewards keeping its two endpoints on the same side.",
+  "n": 90000,
+  "m": 270000,
+  "total_weight": -8872,
+  "weighted": true,
+  "deg_min": 6,
+  "deg_max": 6,
+  "instance_sha256": "b5e5dbe205147dd59b2ca2546a9ee0811894b01480682d826cd6fcaad0bd2f52",
+  "upper_bound": 2823442,
+  "lambda_max": 125.473804328,
+  "sdp_primal": 2822650.179,
+  "foundation_cut": 2266456,
+  "foundation_ratio": 1.24575,
+  "ref_cut": 2716361,
+  "ref_ratio": 1.03942,
+  "ref60_ratio": 1.04088,
+  "ref_seconds": 300,
+  "ref60_cut": 2712551,
+  "bound_rank": 20,
+  "bound_sweeps": 1500
+}

@@ -1,52 +1,18 @@
 {
-  "seed": 20261001,
+  "seed": 20261116,
   "instances": [
-    {
-      "name": "reg200k",
-      "family": "regular",
-      "category": "RANDOM",
-      "time_limit_s": 60,
-      "params": {
-        "n": 200000,
-        "d": 3
-      },
-      "description": "Random 3-regular graph on 200,000 vertices, unit weights. Sparse: every vertex has exactly three neighbours."
-    },
-    {
-      "name": "regw200k",
-      "family": "regular",
-      "category": "RANDOM",
-      "time_limit_s": 60,
-      "params": {
-        "n": 200000,
-        "d": 3,
-        "wmax": 100
-      },
-      "description": "Random 3-regular graph on 200,000 vertices, weights 1-100."
-    },
-    {
-      "name": "gnm200k",
-      "family": "gnm",
-      "category": "RANDOM",
-      "time_limit_s": 60,
-      "params": {
-        "n": 200000,
-        "m": 300000,
-        "wmax": 100
-      },
-      "description": "Sparse Erdos-Renyi graph, 200,000 vertices and 300,000 edges (average degree 3), weights 1-100; degrees vary and some vertices are isolated."
-    },
     {
       "name": "tri400tail",
       "family": "tritail",
-      "category": "STRUCTURED",
-      "time_limit_s": 60,
+      "category": "POSITIVE",
+      "time_limit_s": 30,
       "params": {
         "L": 400,
         "wmax": 100,
         "tail": 3
       },
       "published": {
+        "seed": 20261001,
         "params": {
           "relabel_seed": 9101,
           "weight_seed": 7101
@@ -57,8 +23,8 @@
     {
       "name": "dlat400",
       "family": "dlat",
-      "category": "STRUCTURED",
-      "time_limit_s": 60,
+      "category": "POSITIVE",
+      "time_limit_s": 30,
       "params": {
         "L": 400,
         "pdel": 100,
@@ -74,68 +40,71 @@
       "description": "Irregular frustrated lattice: the 400 x 400 triangular torus with 10% of its edges deleted at random, then extra edges up to 480,000 (80% to a random vertex within 4 rows and columns, 20% between two random vertices). Degrees vary (0-12); heavy-tailed weights 1-100 as in tri400tail."
     },
     {
-      "name": "geo20k",
-      "family": "geo",
-      "category": "STRUCTURED",
-      "time_limit_s": 60,
+      "name": "tri300s",
+      "family": "tritail",
+      "category": "SIGNED",
+      "time_limit_s": 30,
       "params": {
-        "n": 20000,
-        "deg": 12,
-        "wmax": 100
+        "L": 300,
+        "tail": 3,
+        "neg": 500
       },
-      "description": "Random geometric graph: 20,000 points in a square, pairs within a radius joined (average degree 12), closer pairs heavier. Dense local clusters of triangles."
+      "description": "Signed triangular lattice on a 300 x 300 torus (90,000 vertices, degree 6): heavy-tailed magnitudes 1-100 as in tri400tail, and each edge negative with probability 1/2. A negative edge rewards keeping its two endpoints on the same side."
     },
     {
-      "name": "dev_reg10k",
-      "family": "regular",
-      "category": "RANDOM",
-      "time_limit_s": 10,
+      "name": "tri200s4",
+      "family": "tritail",
+      "category": "SIGNED",
+      "time_limit_s": 30,
       "params": {
-        "n": 10000,
-        "d": 3
+        "L": 200,
+        "tail": 4,
+        "neg": 500
       },
-      "description": "dev tier"
+      "description": "Signed triangular lattice on a 200 x 200 torus (40,000 vertices): magnitudes 1 + floor(100 u^4), heavier-tailed than tri300s (most edges very light, a few heavy), random signs."
     },
     {
-      "name": "dev_regw10k",
-      "family": "regular",
-      "category": "RANDOM",
-      "time_limit_s": 10,
+      "name": "tri200g",
+      "family": "tritail",
+      "category": "SIGNED",
+      "time_limit_s": 30,
       "params": {
-        "n": 10000,
+        "L": 200,
+        "gauss": 25
+      },
+      "description": "Triangular lattice on a 200 x 200 torus (40,000 vertices) with bell-shaped weights: each weight is the sum of four uniform draws in [-25, 25] (never 0), so about half are negative and most are small."
+    },
+    {
+      "name": "vbg80k",
+      "family": "regular",
+      "category": "SIGNED",
+      "time_limit_s": 30,
+      "params": {
+        "n": 80000,
         "d": 3,
-        "wmax": 100
+        "gauss": 25
       },
-      "description": "dev tier"
-    },
-    {
-      "name": "dev_gnm10k",
-      "family": "gnm",
-      "category": "RANDOM",
-      "time_limit_s": 10,
-      "params": {
-        "n": 10000,
-        "m": 15000,
-        "wmax": 100
-      },
-      "description": "dev tier"
+      "description": "Random 3-regular graph on 80,000 vertices with the same bell-shaped signed weights as tri200g."
     },
     {
       "name": "dev_tri60tail",
       "family": "tritail",
-      "category": "STRUCTURED",
+      "category": "POSITIVE",
       "time_limit_s": 10,
       "params": {
         "L": 60,
         "wmax": 100,
         "tail": 3
       },
+      "published": {
+        "seed": 20261001
+      },
       "description": "dev tier"
     },
     {
       "name": "dev_dlat100",
       "family": "dlat",
-      "category": "STRUCTURED",
+      "category": "POSITIVE",
       "time_limit_s": 10,
       "params": {
         "L": 100,
@@ -146,17 +115,55 @@
         "wmax": 100,
         "tail": 3
       },
+      "published": {
+        "seed": 20261001
+      },
       "description": "dev tier"
     },
     {
-      "name": "dev_geo4k",
-      "family": "geo",
-      "category": "STRUCTURED",
+      "name": "dev_tri100s",
+      "family": "tritail",
+      "category": "SIGNED",
       "time_limit_s": 10,
       "params": {
-        "n": 4000,
-        "deg": 12,
-        "wmax": 100
+        "L": 100,
+        "tail": 3,
+        "neg": 500
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_tri60s4",
+      "family": "tritail",
+      "category": "SIGNED",
+      "time_limit_s": 10,
+      "params": {
+        "L": 60,
+        "tail": 4,
+        "neg": 500
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_tri60g",
+      "family": "tritail",
+      "category": "SIGNED",
+      "time_limit_s": 10,
+      "params": {
+        "L": 60,
+        "gauss": 25
+      },
+      "description": "dev tier"
+    },
+    {
+      "name": "dev_vbg10k",
+      "family": "regular",
+      "category": "SIGNED",
+      "time_limit_s": 10,
+      "params": {
+        "n": 10000,
+        "d": 3,
+        "gauss": 25
       },
       "description": "dev tier"
     }

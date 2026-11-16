@@ -3,7 +3,7 @@
 #
 # Usage:
 #   scripts/download.sh
-#   RELEASE_TAG=v1.0 scripts/download.sh     # another release (also RELEASE_REPO)
+#   RELEASE_TAG=v1.1 scripts/download.sh     # another release (also RELEASE_REPO)
 #
 # The .mc files arrive gzipped and are decompressed into instances/, so every
 # path in the README works unchanged. Each file's SHA-256 is checked against
@@ -16,12 +16,12 @@
 set -euo pipefail
 
 REPO="${RELEASE_REPO:-ythuang0522/maxcut-competition}"
-TAG="${RELEASE_TAG:-v1.1}"
+TAG="${RELEASE_TAG:-v1.2}"
 
 cd "$(dirname "$0")/.."
 mkdir -p instances
 
-names=(reg200k regw200k gnm200k tri400tail dlat400 geo20k)
+names=(tri400tail dlat400 tri300s tri200s4 tri200g vbg80k)
 sums="checksums/scored.sha256"
 
 sha256_of() {
@@ -44,7 +44,7 @@ done
 tmp="$(mktemp -d instances/.download.XXXXXX)"
 trap 'rm -rf "$tmp"' EXIT
 
-echo "Downloading the scored graphs from ${REPO} @ ${TAG} (about 11 MB compressed, 30 MB on disk) ..."
+echo "Downloading the scored graphs from ${REPO} @ ${TAG} (about 9 MB compressed, 25 MB on disk) ..."
 for name in "${names[@]}"; do
   dest="instances/${name}.mc"
   want="$(want_of "$name")"

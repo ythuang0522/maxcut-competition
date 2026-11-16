@@ -1,8 +1,8 @@
 {
   "name": "tri400tail",
   "family": "tritail",
-  "category": "STRUCTURED",
-  "time_limit_s": 60,
+  "category": "POSITIVE",
+  "time_limit_s": 30,
   "seed": 20261001,
   "params": {
     "L": 400,
@@ -24,11 +24,11 @@
   "sdp_primal": 10817303.255,
   "foundation_cut": 9888193,
   "foundation_ratio": 1.09416,
-  "ref_cut": 10596988,
-  "ref_ratio": 1.02097,
-  "ref60_ratio": 1.02272,
+  "ref_cut": 10632420,
+  "ref_ratio": 1.01757,
+  "ref60_ratio": 1.01821,
   "ref_seconds": 300,
-  "ref60_cut": 10578923,
+  "ref60_cut": 10625730,
   "bound_rank": 20,
   "bound_sweeps": 1500
 }

@@ -1,7 +1,7 @@
 {
   "name": "dev_dlat100",
   "family": "dlat",
-  "category": "STRUCTURED",
+  "category": "POSITIVE",
   "time_limit_s": 10,
   "seed": 20261001,
   "params": {
@@ -26,11 +26,11 @@
   "sdp_primal": 686375.178,
   "foundation_cut": 620607,
   "foundation_ratio": 1.10621,
-  "ref_cut": 670040,
-  "ref_ratio": 1.0246,
-  "ref60_ratio": 1.02661,
+  "ref_cut": 671558,
+  "ref_ratio": 1.02228,
+  "ref60_ratio": 1.02232,
   "ref_seconds": 30,
-  "ref60_cut": 668729,
+  "ref60_cut": 671532,
   "bound_rank": 20,
   "bound_sweeps": 1500
 }
